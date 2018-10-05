@@ -1,0 +1,28 @@
+{
+  "site": {
+    "port": 80
+  },
+  "cookie": {
+    "keys": ["...."],
+    "signed": false,
+    "maxAge": 604800,
+    "name": "animeshot:login"
+  },
+  "oauth": {
+    "server": {
+      "protocol": "http",
+      "host": "as2.bitinn.net",
+      "callback": "/oauth/callback",
+      "transport": "session",
+      "state": true
+    },
+    "twitter": {
+      "key": "....",
+      "secret": "...."
+    },
+    "github": {
+      "key": "....",
+      "secret": "...."
+    }
+  }
+}
