@@ -1,0 +1,41 @@
+{
+  "name": "animeshot2",
+  "version": "1.0.0",
+  "description": "An open and searchable image repository in Node.js",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon --ext js,pug index.js",
+    "setup": "node setup.js",
+    "reset": "node reset.js",
+    "seed": "node seed.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bitinn/animeshot2.git"
+  },
+  "author": "David Frank",
+  "license": "AGPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/bitinn/animeshot2/issues"
+  },
+  "homepage": "https://github.com/bitinn/animeshot2#readme",
+  "dependencies": {
+    "faker": "^4.1.0",
+    "grant-koa": "^4.1.2",
+    "koa": "^2.5.3",
+    "koa-logger": "^3.2.0",
+    "koa-session": "^5.9.0",
+    "koa-static": "^5.0.0",
+    "koa-trie-router": "^2.1.6",
+    "koa-views": "^6.1.4",
+    "openrecord": "^2.4.0",
+    "promptly": "^3.0.3",
+    "pug": "^2.0.3",
+    "sharp": "^0.20.8",
+    "sqlite3": "^4.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.4"
+  }
+}
