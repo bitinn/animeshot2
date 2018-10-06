@@ -1,7 +1,12 @@
 {
   "site": {
+    "meta": {
+      "title": "AnimeShot",
+      "owner": "....",
+      "tagline": "....",
+      "logo": "/images/animeshot.jpg"
+    },
     "dev": true,
-    "proxy": "....",
     "port": 80
   },
   "cookie": {

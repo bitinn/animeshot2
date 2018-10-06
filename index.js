@@ -41,10 +41,9 @@ const router = new koaRouter();
 router.get('/', async (ctx) => {
   await db.ready();
   const userModel = db.Model('users');
-  const user = await userModel.find(1);
 
   const data = {
-    title: user.username
+    meta: settings.site.meta
   };
 
   await ctx.render('index', data);
@@ -81,7 +80,7 @@ router.get(settings.oauth.server.callback, async (ctx) => {
     return result[1];
   });
 
-  // match or store it in database
+  // find or create it in database
   await db.ready();
   const userModel = db.Model('users');
 
