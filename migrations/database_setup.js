@@ -16,7 +16,7 @@ module.exports = function database_setup () {
     this.integer('id', { unique: true, not_null: true, primary: true });
     this.string('username', { not_null: true, unique: true });
     this.string('nickname');
-    this.integer('twitter_id', { not_null: true, unique: true });
+    this.integer('twitter_id', { unique: true });
     this.string('twitter_token');
     this.boolean('is_mod', { default: false });
     this.datetime('created', { not_null: true });

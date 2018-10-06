@@ -16,7 +16,8 @@ async function setupDatabase () {
     file: './database/animeshot.sqlite',
     autoLoad: true,
     migrations: [
-      require('./migrations/database_setup.js')
+      require('./migrations/database_setup.js'),
+      require('./migrations/database_migration_r1.js')
     ]
   });
 

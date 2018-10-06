@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/bitinn/animeshot2#readme",
   "dependencies": {
+    "@purest/providers": "^1.0.1",
     "faker": "^4.1.0",
     "grant-koa": "^4.1.2",
     "koa": "^2.5.3",
@@ -33,10 +34,13 @@
     "openrecord": "^2.4.0",
     "promptly": "^3.0.3",
     "pug": "^2.0.3",
+    "purest": "^3.1.0",
+    "request": "^2.88.0",
     "sharp": "^0.20.8",
     "sqlite3": "^4.0.2"
   },
   "devDependencies": {
-    "nodemon": "^1.18.4"
+    "nodemon": "^1.18.4",
+    "socks-proxy-agent": "^4.0.1"
   }
 }

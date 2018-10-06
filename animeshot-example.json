@@ -1,12 +1,16 @@
 {
   "site": {
+    "dev": true,
+    "proxy": "....",
     "port": 80
   },
   "cookie": {
     "keys": ["...."],
-    "signed": false,
-    "maxAge": 604800,
-    "name": "animeshot:login"
+    "session": {
+      "signed": false,
+      "maxAge": 604800,
+      "key": "animeshot:login"
+    }
   },
   "oauth": {
     "server": {
