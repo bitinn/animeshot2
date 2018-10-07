@@ -1,0 +1,13 @@
+div.columns.p-2.mt-2
+  div.column.col-6.col-sm-12
+    h1.h3
+      a(href="/") #{meta.title}
+    p #{meta.tagline}
+  div.column.col-6.col-sm-12
+    form(action="/action/search")
+      div.input-group
+        label.input-group-addon Keyword
+        input.form-input(type="text" placeholder="")
+        button.btn.btn-primary.input-group-btn(type="submit") Search
+  div.column.col-12
+    div.divider

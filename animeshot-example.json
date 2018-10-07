@@ -4,7 +4,32 @@
       "title": "AnimeShot",
       "owner": "....",
       "tagline": "....",
-      "logo": "/images/animeshot.jpg"
+      "logo": "/images/animeshot.jpg",
+      "lang": "en"
+    },
+    "i18n": {
+      "en": {
+        "recent": "Recent",
+        "top": "Top",
+        "login": "Login",
+        "likes": "👍 Likes",
+        "flags": "⛳ Flags",
+        "logout": "Logout",
+        "like": "👍 Like",
+        "flag": "⛳ Flag",
+        "source": "❔ Source"
+      },
+      "zh": {
+        "recent": "近期上传",
+        "top": "热门上传",
+        "login": "登入账号",
+        "likes": "👍 喜爱列表",
+        "flags": "⛳ 插旗列表",
+        "logout": "登出账号",
+        "like": "👍 喜爱",
+        "flag": "⛳ 插旗",
+        "source": "❔ 出处"
+      }
     },
     "dev": true,
     "port": 80

@@ -16,8 +16,8 @@ async function seedDatabase () {
     file: './database/animeshot.sqlite',
     autoLoad: true,
     migrations: [
-        require('./migrations/database_seed.js')
-      ]
+      require('../migrations/database_seed')
+    ]
   });
 
   await db.ready();

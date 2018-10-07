@@ -1,0 +1,19 @@
+div.column.col-2.col-sm-3.col-xs-12
+  ul.nav
+    li.nav-item
+      a(href="/recent") #{i18n.recent}
+    li.nav-item
+      a(href="/top") #{i18n.top}
+    if !user
+      li.nav-item.active
+        a(href="/login") #{i18n.login}
+    else
+      li.nav-item
+        a(href="/my") ~#{user.username}
+      ul.nav
+        li.nav-item
+          a(href="/my/likes") #{i18n.likes}
+        li.nav-item
+          a(href="/my/flags") #{i18n.flags}
+        li.nav-item
+          a(href="/logout") #{i18n.logout}

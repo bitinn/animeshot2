@@ -16,7 +16,7 @@ async function resetDatabase () {
     file: './database/animeshot.sqlite',
     autoLoad: true,
     migrations: [
-      require('./migrations/database_reset.js')
+      require('../migrations/database_reset')
     ]
   });
   

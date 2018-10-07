@@ -6,9 +6,9 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon --ext js,pug,json index.js",
-    "setup": "node setup.js",
-    "reset": "node reset.js",
-    "seed": "node seed.js"
+    "setup": "node ./scripts/setup.js",
+    "reset": "node ./scripts/reset.js",
+    "seed": "node ./scripts/seed.js"
   },
   "repository": {
     "type": "git",

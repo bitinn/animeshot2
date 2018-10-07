@@ -1,0 +1,22 @@
+div.column.col-10.col-sm-9.col-xs-12
+  div.columns
+    each shot in shots
+      div.column.col-6.col-sm-12.mt-2
+        div.card
+          div.card-image
+            img.img-responsive(src="https://placeimg.com/640/360/arch" alt=shot.text)
+          div.card-body
+            if shot.text
+              p #{shot.text}
+            if shot.user && shot.user.username
+              div.chip
+                div.avatar.avatar-sm.bg-primary(data-initial=shot.user.username.substring(0,1))
+                  a(href="/" + shot.user.username)
+                    // TODO: avatar image
+                span
+                  a.text-dark(href="/" + shot.user.username) #{shot.user.nickname}
+          div.card-footer
+            form(action="/action/shot")
+              button.btn.m-1(type="submit") #{i18n.like}
+              button.btn.btn-secondary.m-1(type="submit") #{i18n.flag}
+              a.btn.btn-secondary.m-1(href="#" target="_blank") #{i18n.source}
