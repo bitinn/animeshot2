@@ -5,7 +5,7 @@ module.exports = function database_seed () {
   this.seed(async (db) => {
     const userModel = db.Model('users');
     const shotModel = db.Model('shots');
-    const voteModel = db.Model('votes');
+    const noteModel = db.Model('notes');
     const flagModel = db.Model('flags');
 
     const userIDList = [];
@@ -31,8 +31,10 @@ module.exports = function database_seed () {
       i++;
     }
 
+    console.log('seed step: generate user data and insert');
+
     i = 0;
-    while (i < 100) {
+    while (i < 2000) {
       let text = faker.lorem.words();
 
       let shot = {
@@ -40,7 +42,7 @@ module.exports = function database_seed () {
         text: text,
         text_romanized: text,
         user_id: userIDList[Math.floor(Math.random() * userIDList.length)],
-        vote_count: 0,
+        note_count: 0,
         flag_count: 0,
         created: faker.date.recent(),
         updated: faker.date.recent()
@@ -52,32 +54,36 @@ module.exports = function database_seed () {
       i++;
     }
 
+    console.log('seed step: generate shot data and insert');
+
     i = 0;
-    while (i < 20) {
-      let vote = {
+    while (i < 200) {
+      let note = {
         user_id: userIDList[Math.floor(Math.random() * userIDList.length)],
         shot_id: shotIDList[Math.floor(Math.random() * shotIDList.length)],
         created: faker.date.recent(),
         updated: faker.date.recent()
       }
 
-      const voteCount = await voteModel.where({ user_id: vote.user_id, shot_id: vote.shot_id }).count();
+      const noteCount = await noteModel.where({ user_id: note.user_id, shot_id: note.shot_id }).count();
 
-      if (voteCount != 0) {
+      if (noteCount != 0) {
         continue;
       }
 
-      vote = await voteModel.create(vote);
+      note = await noteModel.create(note);
 
-      let shot = await shotModel.find(vote.shot_id);
-      shot.vote_count = shot.vote_count + 1;
+      let shot = await shotModel.find(note.shot_id);
+      shot.note_count = shot.note_count + 1;
       await shot.save();
 
       i++;
     }
 
+    console.log('seed step: generate note data and insert');
+
     i = 0;
-    while (i < 5) {
+    while (i < 20) {
       let flag = {
         user_id: userIDList[Math.floor(Math.random() * userIDList.length)],
         shot_id: shotIDList[Math.floor(Math.random() * shotIDList.length)],
@@ -99,7 +105,7 @@ module.exports = function database_seed () {
 
       i++;
     }
-  });
 
-  console.log('seed step: generate data and insert');
+    console.log('seed step: generate flag data and insert');
+  });
 }

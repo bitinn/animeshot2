@@ -1,19 +1,19 @@
 div.column.col-2.col-md-3.col-sm-4.col-xs-12
   ul.nav
-    li.nav-item
+    li.nav-item(class=(paging.name == "/recent") ? "active" : "")
       a(href="/recent") #{i18n.recent}
-    li.nav-item
+    li.nav-item(class=(paging.name == "/top") ? "active" : "")
       a(href="/top") #{i18n.top}
     if !user
-      li.nav-item.active
+      li.nav-item(class=(paging.name == "/login") ? "active" : "")
         a(href="/login") #{i18n.login}
     else
-      li.nav-item.active
+      li.nav-item(class=(paging.name == "/my") ? "active" : "")
         a(href="/my") #{i18n.my}
       ul.nav
-        li.nav-item
+        li.nav-item(class=(paging.name == "/my/likes") ? "active" : "")
           a(href="/my/likes") #{i18n.likes}
-        li.nav-item
+        li.nav-item(class=(paging.name == "/my/flags") ? "active" : "")
           a(href="/my/flags") #{i18n.flags}
         li.nav-item
           a(href="/logout") #{i18n.logout}

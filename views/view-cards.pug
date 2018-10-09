@@ -10,11 +10,14 @@ div.column.col-10.col-md-9.col-sm-8.col-xs-12
               p #{shot.text}
             if shot.user && shot.user.username
               div.chip
-                div.avatar.avatar-sm.bg-primary(data-initial=shot.user.username.substring(0,1))
-                  a(href="/" + shot.user.username)
-                    // TODO: avatar image
+                div.avatar.avatar-sm.bg-primary(data-initial=shot.user.name.charAt(0).toUpperCase())
+                  a(href="/user/" + shot.user.username)
+                    if shot.user.twitter_avatar
+                      img(src=shot.user.twitter_avatar alt="avatar")
+                    else if shot.user.github_avatar
+                      img(src=shot.user.github_avatar alt="avatar")
                 span
-                  a.text-dark(href="/" + shot.user.username) #{shot.user.nickname}
+                  a.text-dark(href="/user/" + shot.user.username) #{shot.user.name}
           div.card-footer
             form(action="/action/shot")
               button.btn.btn-sm.m-1(type="submit") #{i18n.like}
@@ -22,3 +25,12 @@ div.column.col-10.col-md-9.col-sm-8.col-xs-12
               a.btn.btn-sm.btn-secondary.m-1(href="#" target="_blank") #{i18n.source}
               if user
                 button.btn.btn-sm.btn-secondary.m-1(type="submit") #{i18n.delete}
+    else
+      div.column.col-12.text-center
+        if paging.name == "/my"
+          a.btn.btn-lg.btn-secondary(href="/") #{i18n.no_upload}
+        else if paging.name == "/my/notes"
+          a.btn.btn-lg.btn-secondary(href="/") #{i18n.no_notes}
+        else if paging.name == "/my/flags"
+          a.btn.btn-lg.btn-secondary(href="/") #{i18n.no_flags}
+

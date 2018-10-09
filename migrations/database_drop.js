@@ -2,7 +2,7 @@
 module.exports = function database_drop () {
   // delete in reverse oreder due to foreign key constraint
   this.removeTable('flags');
-  this.removeTable('votes');
+  this.removeTable('notes');
   this.removeTable('shots');
   this.removeTable('users');
 
