@@ -2,9 +2,10 @@ doctype html
 html(lang=en)
   include meta-site.pug
   body
-    div.container.grid-lg
+    div.container.grid-lg(lang=meta.lang)
       include view-header.pug
       div.columns.p-2
         div.column.col-12.text-center
           a.btn.btn-lg.btn-secondary.m-1(href="/connect/twitter") Login with Twitter
           a.btn.btn-lg.btn-secondary.m-1(href="/connect/github") Login with GitHub
+      include view-footer.pug

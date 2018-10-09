@@ -75,7 +75,7 @@ module.exports = function setupRouter (router, settings) {
   router.get('/', async (ctx) => {
     await db.ready();
     const user = await findCurrentUser(ctx);
-    const shots = await findRecentShots(6, 0);
+    const shots = await findRecentShots(4, 0);
 
     // toJson flatten db result into plain object
     const data = {
@@ -255,22 +255,6 @@ module.exports = function setupRouter (router, settings) {
     // update session cookie
     ctx.session = { user: { id: localUser.id } };
     ctx.redirect('/');
-  });
-  
-  // profile page
-  router.get('/profile', async (ctx) => {
-    // no session data
-    if (!ctx.session || !ctx.session.user) {
-      ctx.redirect('/');
-      return;
-    }
-  
-    // match it in database
-    await db.ready();
-    const userModel = db.Model('users');
-    const localUser = await userModel.find(ctx.session.user.id);
-  
-    ctx.body = localUser;
   });
 
   return router;

@@ -1,32 +1,33 @@
-div.column.col-12
-  ul.pagination.pagination-adapt
-    if paging.current < 2
-      li.page-item.disabled
-        span Prev
-    else
+div.column.column.col-10.col-md-9.col-sm-8.col-xs-12.text-center
+  div.d-inline-block.text-left
+    ul.pagination
+      if paging.current < 2
+        li.page-item.disabled
+          span Prev
+      else
+        li.page-item
+          a(href="/" + paging.name + "/" + (paging.current - 1)) Prev
+      if paging.current > 3
+        li.page-item
+          a(href="/" + paging.name) 1
+      if paging.current > 3
+        li.page-item
+          span ...
       li.page-item
-        a(href="/" + paging.name + "/" + (paging.current - 1)) Prev
-    if paging.current > 3
+        a(href="/" + paging.name + "/" + (paging.current - 1)) #{paging.current - 1}
+      li.page-item.active
+        a(href="/" + paging.name + "/" + paging.current) #{paging.current}
       li.page-item
-        a(href="/" + paging.name) 1
-    if paging.current > 3
-      li.page-item
-        span ...
-    li.page-item
-      a(href="/" + paging.name + "/" + (paging.current - 1)) #{paging.current - 1}
-    li.page-item.active
-      a(href="/" + paging.name + "/" + paging.current) #{paging.current}
-    li.page-item
-      a(href="/" + paging.name + "/" + (paging.current + 1)) #{paging.current + 1}
-    if paging.current < paging.max - 3
-      li.page-item
-        span ...
-    if paging.current < paging.max - 3
-      li.page-item
-        a(href="/" + paging.name + "/" + paging.max) #{paging.max}
-    if paging.current > paging.max - 2
-      li.page-item.disabled
-        span Next
-    else
-      li.page-item
-        a(href="/" + paging.name + "/" + (paging.current + 1)) Next
+        a(href="/" + paging.name + "/" + (paging.current + 1)) #{paging.current + 1}
+      if paging.current < paging.max - 3
+        li.page-item
+          span ...
+      if paging.current < paging.max - 3
+        li.page-item
+          a(href="/" + paging.name + "/" + paging.max) #{paging.max}
+      if paging.current > paging.max - 2
+        li.page-item.disabled
+          span Next
+      else
+        li.page-item
+          a(href="/" + paging.name + "/" + (paging.current + 1)) Next

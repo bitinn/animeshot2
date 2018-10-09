@@ -17,7 +17,9 @@ async function setupDatabase () {
     autoLoad: true,
     migrations: [
       require('../migrations/database_setup'),
-      require('../migrations/database_migration_r1')
+      require('../migrations/database_migration_r1'),
+      require('../migrations/database_migration_r2'),
+      require('../migrations/database_migration_r3')
     ]
   });
 

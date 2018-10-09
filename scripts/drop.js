@@ -5,7 +5,7 @@ const prompt = require('promptly');
 const openrecord = require('openrecord/store/sqlite3');
 
 async function resetDatabase () {
-  const answer = await prompt.confirm('This will DELETE ALL DATA from the animeshot database, only proceed if you are testing locally or have backed up the sqlite file, PROCEED? (y/n)');
+  const answer = await prompt.confirm('This will DELETE ALL TABLES from the animeshot database, only proceed if you are testing locally or have backed up the sqlite file, PROCEED? (y/n)');
 
   if (!answer) {
     console.log('database reset aborted');
@@ -16,17 +16,17 @@ async function resetDatabase () {
     file: './database/animeshot.sqlite',
     autoLoad: true,
     migrations: [
-      require('../migrations/database_reset')
+      require('../migrations/database_drop')
     ]
   });
   
   await db.ready();
 
-  // clean up reset filename cache too
+  // clean up migration filename cache too
   const migrationCache = db.Model('openrecord_migrations');
-  await migrationCache.where({ name: 'database_reset' }).deleteAll();
+  await migrationCache.deleteAll();
 
-  console.log('database reset done, to seed again - npm run db:seed');
+  console.log('database reset done, to setup again - npm run db:setup');
   db.close();
 }
 

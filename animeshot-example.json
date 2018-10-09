@@ -12,23 +12,31 @@
         "recent": "Recent",
         "top": "Top",
         "login": "Login",
+        "my": "📷 My Uploads",
         "likes": "👍 Likes",
         "flags": "⛳ Flags",
         "logout": "Logout",
         "like": "👍 Like",
         "flag": "⛳ Flag",
-        "source": "❔ Source"
+        "source": "🤔 Source",
+        "delete": "❌ Delete",
+        "keyword": "Keyword",
+        "search": "Search"
       },
       "zh": {
         "recent": "近期上传",
         "top": "热门上传",
-        "login": "登入账号",
-        "likes": "👍 喜爱列表",
-        "flags": "⛳ 插旗列表",
-        "logout": "登出账号",
+        "login": "登入",
+        "my": "📷 我的上传",
+        "likes": "👍 喜爱内容",
+        "flags": "⛳ 插旗内容",
+        "logout": "登出账户",
         "like": "👍 喜爱",
         "flag": "⛳ 插旗",
-        "source": "❔ 出处"
+        "source": "🤔 出处",
+        "delete": "❌ 删除",
+        "keyword": "关键词",
+        "search": "搜索"
       }
     },
     "dev": true,

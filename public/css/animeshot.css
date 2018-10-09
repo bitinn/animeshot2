@@ -18,8 +18,10 @@
   color: #fff;
 }
 
+.pagination-wrapper {
+
+}
+
 .pagination-adapt {
-  margin-left: auto;
-  margin-right: auto;
-  width: 20em;
+
 }

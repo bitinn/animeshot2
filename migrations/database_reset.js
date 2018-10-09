@@ -1,9 +1,16 @@
 
 module.exports = function database_reset () {
-  // delete in reverse oreder due to foreign key constraint
-  this.removeTable('votes');
-  this.removeTable('shots');
-  this.removeTable('users');
+  this.seed(async (db) => {
+    const userModel = db.Model('users');
+    const shotModel = db.Model('shots');
+    const voteModel = db.Model('votes');
+    const flagModel = db.Model('flags');
 
-  console.log('reset step: delete tables');
+    await flagModel.deleteAll();
+    await voteModel.deleteAll();
+    await shotModel.deleteAll();
+    await userModel.deleteAll();
+
+    console.log('reset step: delete all data');
+  });
 }

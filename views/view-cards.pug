@@ -17,6 +17,8 @@ div.column.col-10.col-md-9.col-sm-8.col-xs-12
                   a.text-dark(href="/" + shot.user.username) #{shot.user.nickname}
           div.card-footer
             form(action="/action/shot")
-              button.btn.m-1(type="submit") #{i18n.like}
-              button.btn.btn-secondary.m-1(type="submit") #{i18n.flag}
-              a.btn.btn-secondary.m-1(href="#" target="_blank") #{i18n.source}
+              button.btn.btn-sm.m-1(type="submit") #{i18n.like}
+              button.btn.btn-sm.btn-secondary.m-1(type="submit") #{i18n.flag}
+              a.btn.btn-sm.btn-secondary.m-1(href="#" target="_blank") #{i18n.source}
+              if user
+                button.btn.btn-sm.btn-secondary.m-1(type="submit") #{i18n.delete}
