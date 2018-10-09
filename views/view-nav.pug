@@ -1,4 +1,4 @@
-div.column.col-2.col-sm-3.col-xs-12
+div.column.col-2.col-md-3.col-sm-4.col-xs-12
   ul.nav
     li.nav-item
       a(href="/recent") #{i18n.recent}
@@ -8,8 +8,8 @@ div.column.col-2.col-sm-3.col-xs-12
       li.nav-item.active
         a(href="/login") #{i18n.login}
     else
-      li.nav-item
-        a(href="/my") ~#{user.username}
+      li.nav-item.active
+        a(href="/my") #{i18n.my}
       ul.nav
         li.nav-item
           a(href="/my/likes") #{i18n.likes}

@@ -1,44 +1,81 @@
 
-// disable custom inspect function when console.log openrecord results
+// app dependency
+
+const openrecord = require('openrecord/store/sqlite3');
+const request = require('request');
+const promise = Promise;
+const purest = require('purest')({ request, promise });
+const providers = require('@purest/providers');
+
+// define database
+
+const db = new openrecord({
+  file: './database/animeshot.sqlite',
+  autoLoad: true,
+  autoConnect: true,
+  autoAttributes: true
+});
+
+db.Model('User', function () {
+  this.hasMany('shots', { to: 'user_id' });
+  this.hasMany('votes', { to: 'user_id' });
+});
+
+db.Model('Shot', function () {
+  this.belongsTo('user', { model: 'User', from: 'user_id', to: 'id' });
+});
+
+// define oauth sign-in
+
+const githubAPI = purest({ provider: 'github', config: providers });
+const twitterAPI = purest({ provider: 'twitter', config: providers });
+
+// workaround: disable custom inspect function when using console.log()
+
 const util = require('util');
 util.inspect.defaultOptions.customInspect = false;
 
-module.exports = function setupRouter (router, db, settings) {
+//
+// database helper functions
+//
 
-  //
-  // helper functions
-  //
-
-  async function findCurrentUser (ctx) {
-    // no session data
-    if (!ctx.session || !ctx.session.user || !ctx.session.user.id) {
-      return null;
-    }
-
-    // find it in database
-    const userModel = db.Model('users');
-    const currentUser = await userModel.find(ctx.session.user.id);
-
-    return currentUser;
+async function findCurrentUser (ctx) {
+  // no session data
+  if (!ctx.session || !ctx.session.user || !ctx.session.user.id) {
+    return null;
   }
 
-  async function findRecentShots (limit = 0, offset = 0) {
-    // find them in database
-    const shotModel = db.Model('shots');
-    const shots = await shotModel.order('created', true).limit(limit, offset).include('user');
+  // find it in database
+  const userModel = db.Model('users');
+  const currentUser = await userModel.find(ctx.session.user.id);
 
-    return shots;
-  }
+  return currentUser;
+}
 
-  //
-  // define routes
-  //
+async function findRecentShots (limit = 0, offset = 0) {
+  const shotModel = db.Model('shots');
+  const shots = await shotModel.order('created', true).limit(limit, offset).include('user');
 
+  return shots;
+}
+
+async function countShots () {
+  const shotModel = db.Model('shots');
+  const count = await shotModel.count();
+
+  return count;
+}
+
+//
+// define routes
+//
+
+module.exports = function setupRouter (router, settings) {
   // index page
   router.get('/', async (ctx) => {
     await db.ready();
     const user = await findCurrentUser(ctx);
-    const shots = await findRecentShots(4, 0);
+    const shots = await findRecentShots(6, 0);
 
     // toJson flatten db result into plain object
     const data = {
@@ -49,6 +86,71 @@ module.exports = function setupRouter (router, db, settings) {
     };
   
     await ctx.render('page-index', data);
+  });
+
+  // recent page
+  router.get('/recent', async (ctx) => {
+    const page = 1;
+
+    await db.ready();
+    const user = await findCurrentUser(ctx);
+    const shots = await findRecentShots(10, 10 * (page - 1));
+    const count = await countShots();
+
+    // toJson flatten db result into plain object
+    const data = {
+      meta: settings.site.meta,
+      i18n: settings.site.i18n[settings.site.meta.lang],
+      user: user ? user.toJson() : null,
+      shots: shots ? shots.toJson() : [],
+      paging: {
+        name: 'recent',
+        current: page,
+        max: Math.ceil(count / 10)
+      }
+    };
+  
+    await ctx.render('page-recent', data);
+  });
+
+  // recent paging
+  router.get('/recent/:page', async (ctx) => {
+    const page = parseInt(ctx.request.params.page) - 1;
+    if (isNaN(page)) {
+      ctx.redirect('/');
+      return;
+    }
+
+    if (page <= 1) {
+      ctx.redirect('/recent');
+      return;
+    }
+
+    await db.ready();
+    const count = await countShots();
+
+    if (page * 10 > count) {
+      ctx.redirect('/recent');
+      return;
+    }
+
+    const user = await findCurrentUser(ctx);
+    const shots = await findRecentShots(10, 10 * (page - 1));
+
+    // toJson flatten db result into plain object
+    const data = {
+      meta: settings.site.meta,
+      i18n: settings.site.i18n[settings.site.meta.lang],
+      user: user ? user.toJson() : null,
+      shots: shots ? shots.toJson() : [],
+      paging: {
+        name: 'recent',
+        current: page,
+        max: Math.ceil(count / 10)
+      }
+    };
+  
+    await ctx.render('page-recent', data);
   });
 
   // login page
@@ -68,6 +170,12 @@ module.exports = function setupRouter (router, db, settings) {
     };
   
     await ctx.render('page-login', data);
+  });
+
+  // logout page
+  router.get('/logout', async (ctx) => {
+    ctx.session = null
+    ctx.redirect('/');
   });
 
   // oauth callback
@@ -146,7 +254,7 @@ module.exports = function setupRouter (router, db, settings) {
   
     // update session cookie
     ctx.session = { user: { id: localUser.id } };
-    ctx.redirect('/profile');
+    ctx.redirect('/');
   });
   
   // profile page

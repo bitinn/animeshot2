@@ -10,45 +10,15 @@ const koaRouter = require('koa-trie-router');
 const koaSession = require('koa-session');
 const koaMount = require('koa-mount');
 
-const openrecord = require('openrecord/store/sqlite3');
-
 const grant = require('grant-koa');
-const request = require('request');
-const promise = Promise;
-const purest = require('purest')({ request, promise });
-const providers = require('@purest/providers');
 
-const setupRouter = require('./scripts/routes');
-
+const setupRouter = require('./routes');
 const settings = require('./animeshot.json');
-
-// define oauth sign-in
-
-const githubAPI = purest({ provider: 'github', config: providers });
-const twitterAPI = purest({ provider: 'twitter', config: providers });
-
-// define database
-
-const db = new openrecord({
-  file: './database/animeshot.sqlite',
-  autoLoad: true,
-  autoConnect: true,
-  autoAttributes: true
-});
-
-db.Model('User', function () {
-  this.hasMany('shots', { to: 'user_id' });
-  this.hasMany('votes', { to: 'user_id' });
-});
-
-db.Model('Shot', function () {
-  this.belongsTo('user', { model: 'User', from: 'user_id', to: 'id' });
-});
 
 // define routing
 
 const router = new koaRouter();
-setupRouter(router, db, settings);
+setupRouter(router, settings);
 
 // define app
 

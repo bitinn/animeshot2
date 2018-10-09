@@ -17,3 +17,9 @@
   background-color: #50596c;
   color: #fff;
 }
+
+.pagination-adapt {
+  margin-left: auto;
+  margin-right: auto;
+  width: 20em;
+}
