@@ -20,17 +20,17 @@ div.column.col-10.col-md-9.col-sm-8.col-xs-12
                   a.text-dark(href="/user/" + shot.user.username) #{shot.user.name}
           div.card-footer
             form(action="/action/shot")
-              button.btn.btn-sm.m-1(type="submit") #{i18n.like}
-              button.btn.btn-sm.btn-secondary.m-1(type="submit") #{i18n.flag}
-              a.btn.btn-sm.btn-secondary.m-1(href="#" target="_blank") #{i18n.source}
-              if user
-                button.btn.btn-sm.btn-secondary.m-1(type="submit") #{i18n.delete}
+              button.btn.btn-sm.m-1.tooltip(type="submit" data-tooltip=i18n.bookmark) #{i18n.bookmark_icon} #{shot.bookmark_count}
+              button.btn.btn-sm.btn-secondary.m-1.tooltip(type="submit" data-tooltip=i18n.flag) #{i18n.flag_icon} #{shot.flag_count}
+              a.btn.btn-sm.btn-secondary.m-1(href="#" target="_blank") #{i18n.source_icon} #{i18n.source}
+              if user && user.is_mod
+                button.btn.btn-sm.btn-secondary.m-1(type="submit") #{i18n.delete_icon} #{i18n.delete}
     else
       div.column.col-12.text-center
         if paging.name == "/my"
           a.btn.btn-lg.btn-secondary(href="/") #{i18n.no_upload}
-        else if paging.name == "/my/notes"
-          a.btn.btn-lg.btn-secondary(href="/") #{i18n.no_notes}
+        else if paging.name == "/my/bookmarks"
+          a.btn.btn-lg.btn-secondary(href="/") #{i18n.no_bookmarks}
         else if paging.name == "/my/flags"
           a.btn.btn-lg.btn-secondary(href="/") #{i18n.no_flags}
 

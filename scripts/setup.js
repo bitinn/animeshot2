@@ -16,11 +16,13 @@ async function setupDatabase () {
     file: './database/animeshot.sqlite',
     autoLoad: true,
     migrations: [
-      require('../migrations/database_setup'),
+      require('../migrations/database_migration_r0'),
       require('../migrations/database_migration_r1'),
       require('../migrations/database_migration_r2'),
       require('../migrations/database_migration_r3'),
-      require('../migrations/database_migration_r4')
+      require('../migrations/database_migration_r4'),
+      require('../migrations/database_migration_r5'),
+      require('../migrations/database_migration_r6'),
     ]
   });
 

@@ -18,7 +18,7 @@ const db = new openrecord({
 
 db.Model('users', function () {
   this.hasMany('shot', { to: 'user_id' });
-  this.hasMany('note', { to: 'user_id' });
+  this.hasMany('bookmark', { to: 'user_id' });
   this.hasMany('flag', { to: 'user_id' });
 });
 
@@ -26,7 +26,7 @@ db.Model('shots', function () {
   this.belongsTo('user', { model: 'users', from: 'user_id', to: 'id' });
 });
 
-db.Model('notes', function () {
+db.Model('bookmarks', function () {
   this.belongsTo('user', { model: 'users', from: 'user_id', to: 'id' });
   this.belongsTo('shot', { model: 'shots', from: 'shot_id', to: 'id' });
 });
@@ -80,7 +80,14 @@ async function findRecentShots (limit = 0, offset = 0) {
 
 async function findTopShots (limit = 0, offset = 0) {
   const shotModel = db.Model('shots');
-  const shots = await shotModel.where({ note_count_gt: 0 }).order('note_count', true).order('created', true).limit(limit, offset).include('user');
+  const shots = await shotModel.where({ bookmark_count_gt: 0 }).order('created', true).limit(limit, offset).include('user');
+
+  return shots;
+}
+
+async function findFlagShots (limit = 0, offset = 0) {
+  const shotModel = db.Model('shots');
+  const shots = await shotModel.where({ flag_count_gt: 0 }).order('created', true).limit(limit, offset).include('user');
 
   return shots;
 }
@@ -92,9 +99,37 @@ async function findUserShots (id = 0, limit = 0, offset = 0) {
   return shots;
 }
 
+async function findUserBookmarks (id = 0, limit = 0, offset = 0) {
+  const bookModel = db.Model('bookmarks');
+  const books = await bookModel.where({ user_id: id }).order('created', true).limit(limit, offset).include('shot');
+
+  return books;
+}
+
+async function findUserFlags (id = 0, limit = 0, offset = 0) {
+  const flagModel = db.Model('flags');
+  const flags = await flagModel.where({ user_id: id }).order('created', true).limit(limit, offset).include('shot');
+
+  return flags;
+}
+
 async function countShots () {
   const shotModel = db.Model('shots');
   const count = await shotModel.count();
+
+  return count;
+}
+
+async function countTopShots () {
+  const shotModel = db.Model('shots');
+  const count = await shotModel.where({ bookmark_count_gt: 0 }).count();
+
+  return count;
+}
+
+async function countFlagShots () {
+  const shotModel = db.Model('shots');
+  const count = await shotModel.where({ flag_count_gt: 0 }).count();
 
   return count;
 }
@@ -106,9 +141,16 @@ async function countUserShots (id = 0) {
   return count;
 }
 
-async function countTopShots () {
-  const shotModel = db.Model('shots');
-  const count = await shotModel.where({ note_count_gt: 0 }).count();
+async function countUserBookmarks (id = 0) {
+  const bookModel = db.Model('bookmarks');
+  const count = await bookModel.where({ user_id: id }).count();
+
+  return count;
+}
+
+async function countUserFlags (id = 0) {
+  const flagModel = db.Model('flags');
+  const count = await flagModel.where({ user_id: id }).count();
 
   return count;
 }
@@ -118,7 +160,9 @@ async function countTopShots () {
 //
 
 module.exports = function setupRouter (router, settings) {
-  ////// index page
+  //
+  // index page
+  //
   router.get('/', async (ctx) => {
     await db.ready();
     const user = await findCurrentUser(ctx);
@@ -138,7 +182,9 @@ module.exports = function setupRouter (router, settings) {
     await ctx.render('page-index', data);
   });
 
-  ////// recent shots
+  //
+  // recent shots
+  //
   router.get('/recent', async (ctx) => {
     await db.ready();
     const page = 1;
@@ -161,7 +207,9 @@ module.exports = function setupRouter (router, settings) {
     await ctx.render('page-recent', data);
   });
 
-  ////// recent shots paging
+  //
+  // recent shots paging
+  //
   router.get('/recent/:page', async (ctx) => {
     // validate page number
     const page = parseInt(ctx.request.params.page);
@@ -196,7 +244,9 @@ module.exports = function setupRouter (router, settings) {
     await ctx.render('page-recent', data);
   });
 
-  ////// top shots
+  //
+  // top shots
+  //
   router.get('/top', async (ctx) => {
     await db.ready();
     const page = 1;
@@ -219,9 +269,10 @@ module.exports = function setupRouter (router, settings) {
     await ctx.render('page-recent', data);
   });
 
-  ////// top shots paging
+  //
+  // top shots paging
+  //
   router.get('/top/:page', async (ctx) => {
-    // validate page number
     const page = parseInt(ctx.request.params.page);
     if (isNaN(page) || page < 2 || page != ctx.request.params.page) {
       ctx.redirect('/top');
@@ -254,28 +305,25 @@ module.exports = function setupRouter (router, settings) {
     await ctx.render('page-recent', data);
   });
 
-  ////// my profile
-  router.get('/my', async (ctx) => {
+  //
+  // manage shots
+  //
+  router.get('/management', async (ctx) => {
     await db.ready();
-    const user = await findCurrentUser(ctx);
-
-    if (!user) {
-      ctx.redirect('/');
-      return;
-    }
-
     const page = 1;
-    const shots = await findUserShots(user.id, 10, 10 * (page - 1));
-    const count = await countUserShots(user.id);
+    const user = await findCurrentUser(ctx);
+    const shots = await findFlagShots(10, 10 * (page - 1));
+    const count = await countFlagShots();
 
-    // toJson flatten db result into plain object
+    console.log(user.is_mod);
+
     const data = {
       meta: settings.site.meta,
       i18n: settings.site.i18n[settings.site.meta.lang],
       user: user ? user.toJson() : null,
       shots: shots ? shots.toJson() : [],
       paging: {
-        name: '/my',
+        name: '/management',
         current: page,
         max: Math.ceil(count / 10)
       }
@@ -284,38 +332,34 @@ module.exports = function setupRouter (router, settings) {
     await ctx.render('page-recent', data);
   });
 
-  ////// my profile paging
-  router.get('/my/:page', async (ctx) => {
-    await db.ready();
-    const user = await findCurrentUser(ctx);
-
-    if (!user) {
-      ctx.redirect('/');
-      return;
-    }
-
+  //
+  // manage shots paging
+  //
+  router.get('/management/:page', async (ctx) => {
     const page = parseInt(ctx.request.params.page);
     if (isNaN(page) || page < 2 || page != ctx.request.params.page) {
-      ctx.redirect('/my');
+      ctx.redirect('/management');
       return;
     }
 
-    const count = await countUserShots(user.id);
+    await db.ready();
+    const count = await countFlagShots();
+
     if ((page - 1) * 10 > count) {
-      ctx.redirect('/my');
+      ctx.redirect('/management');
       return;
     }
 
-    const shots = await findUserShots(user.id, 10, 10 * (page - 1));
+    const user = await findCurrentUser(ctx);
+    const shots = await findFlagShots(10, 10 * (page - 1));
 
-    // toJson flatten db result into plain object
     const data = {
       meta: settings.site.meta,
       i18n: settings.site.i18n[settings.site.meta.lang],
       user: user ? user.toJson() : null,
       shots: shots ? shots.toJson() : [],
       paging: {
-        name: '/my',
+        name: '/management',
         current: page,
         max: Math.ceil(count / 10)
       }
@@ -324,7 +368,9 @@ module.exports = function setupRouter (router, settings) {
     await ctx.render('page-recent', data);
   });
 
-  ////// user profile
+  //
+  // user profile
+  //
   router.get('/user/:username', async (ctx) => {
     const username = ctx.request.params.username;
 
@@ -341,7 +387,6 @@ module.exports = function setupRouter (router, settings) {
     const shots = await findUserShots(profile.id, 10, 10 * (page - 1));
     const count = await countUserShots(profile.id);
 
-    // toJson flatten db result into plain object
     const data = {
       meta: settings.site.meta,
       i18n: settings.site.i18n[settings.site.meta.lang],
@@ -357,7 +402,9 @@ module.exports = function setupRouter (router, settings) {
     await ctx.render('page-recent', data);
   });
 
-  ////// user profile paging
+  //
+  // user profile paging
+  //
   router.get('/user/:username/:page', async (ctx) => {
     const username = ctx.request.params.username;
 
@@ -384,7 +431,6 @@ module.exports = function setupRouter (router, settings) {
     const user = await findCurrentUser(ctx);
     const shots = await findUserShots(profile.id, 10, 10 * (page - 1));
 
-    // toJson flatten db result into plain object
     const data = {
       meta: settings.site.meta,
       i18n: settings.site.i18n[settings.site.meta.lang],
@@ -400,7 +446,349 @@ module.exports = function setupRouter (router, settings) {
     await ctx.render('page-recent', data);
   });
 
-  ////// login page
+  //
+  // user bookmarks (not used)
+  //
+  /*
+  router.get('/user/:username/bookmarks', async (ctx) => {
+    const username = ctx.request.params.username;
+
+    await db.ready();
+    const profile = await findUserByName(username);
+
+    if (!profile) {
+      ctx.redirect('/');
+      return;
+    }
+
+    const page = 1;
+    const user = await findCurrentUser(ctx);
+    const books = await findUserBookmarks(profile.id, 10, 10 * (page - 1));
+    const count = await countUserBookmarks(profile.id);
+
+    // extract shot data from bookmark data
+    const shots = [];
+    for (let i = 0; i < books.length; i++) {
+      const bookFlatten = books[i].toJson();
+      shots.push(bookFlatten.shot);
+    }
+
+    // since shot data is flatten already, just use it
+    const data = {
+      meta: settings.site.meta,
+      i18n: settings.site.i18n[settings.site.meta.lang],
+      user: user ? user.toJson() : null,
+      shots: shots,
+      paging: {
+        name: '/user/' + username + '/bookmarks',
+        current: page,
+        max: Math.ceil(count / 10)
+      }
+    };
+  
+    await ctx.render('page-recent', data);
+  });
+  */
+
+  //
+  // user bookmarks paging (not used)
+  //
+  /*
+  router.get('/user/:username/bookmarks/:page', async (ctx) => {
+    const username = ctx.request.params.username;
+
+    await db.ready();
+    const profile = await findUserByName(username);
+
+    if (!profile) {
+      ctx.redirect('/');
+      return;
+    }
+
+    const page = parseInt(ctx.request.params.page);
+    if (isNaN(page) || page < 2 || page != ctx.request.params.page) {
+      ctx.redirect('/user/' + username + '/bookmarks');
+      return;
+    }
+
+    const count = await countUserBookmarks(profile.id);
+    if ((page - 1) * 10 > count) {
+      ctx.redirect('/user/' + username + '/bookmarks');
+      return;
+    }
+
+    const user = await findCurrentUser(ctx);
+    const books = await findUserBookmarks(profile.id, 10, 10 * (page - 1));
+
+    const shots = [];
+    for (let i = 0; i < books.length; i++) {
+      const bookFlatten = books[i].toJson();
+      shots.push(bookFlatten.shot);
+    }
+
+    const data = {
+      meta: settings.site.meta,
+      i18n: settings.site.i18n[settings.site.meta.lang],
+      user: user ? user.toJson() : null,
+      shots: shots,
+      paging: {
+        name: '/user/' + username + '/bookmarks',
+        current: page,
+        max: Math.ceil(count / 10)
+      }
+    };
+  
+    await ctx.render('page-recent', data);
+  });
+  */
+
+  //
+  // my profile
+  //
+  router.get('/my', async (ctx) => {
+    await db.ready();
+    const user = await findCurrentUser(ctx);
+
+    if (!user) {
+      ctx.redirect('/');
+      return;
+    }
+
+    const page = 1;
+    const shots = await findUserShots(user.id, 10, 10 * (page - 1));
+    const count = await countUserShots(user.id);
+
+    const data = {
+      meta: settings.site.meta,
+      i18n: settings.site.i18n[settings.site.meta.lang],
+      user: user ? user.toJson() : null,
+      shots: shots ? shots.toJson() : [],
+      paging: {
+        name: '/my',
+        current: page,
+        max: Math.ceil(count / 10)
+      }
+    };
+  
+    await ctx.render('page-recent', data);
+  });
+
+  //
+  // my profile paging
+  //
+  router.get('/my/:page', async (ctx) => {
+    await db.ready();
+    const user = await findCurrentUser(ctx);
+
+    if (!user) {
+      ctx.redirect('/');
+      return;
+    }
+
+    const page = parseInt(ctx.request.params.page);
+    if (isNaN(page) || page < 2 || page != ctx.request.params.page) {
+      ctx.redirect('/my');
+      return;
+    }
+
+    const count = await countUserShots(user.id);
+    if ((page - 1) * 10 > count) {
+      ctx.redirect('/my');
+      return;
+    }
+
+    const shots = await findUserShots(user.id, 10, 10 * (page - 1));
+
+    const data = {
+      meta: settings.site.meta,
+      i18n: settings.site.i18n[settings.site.meta.lang],
+      user: user ? user.toJson() : null,
+      shots: shots ? shots.toJson() : [],
+      paging: {
+        name: '/my',
+        current: page,
+        max: Math.ceil(count / 10)
+      }
+    };
+  
+    await ctx.render('page-recent', data);
+  });
+
+  //
+  // my bookmark
+  //
+  router.get('/my/bookmarks', async (ctx) => {
+    await db.ready();
+    const user = await findCurrentUser(ctx);
+
+    if (!user) {
+      ctx.redirect('/');
+      return;
+    }
+
+    const page = 1;
+    const books = await findUserBookmarks(user.id, 10, 10 * (page - 1));
+    const count = await countUserBookmarks(user.id);
+
+    // extract shot data from bookmark data
+    const shots = [];
+    for (let i = 0; i < books.length; i++) {
+      const bookFlatten = books[i].toJson();
+      shots.push(bookFlatten.shot);
+    }
+
+    // since shot data is flatten already, just use it
+    const data = {
+      meta: settings.site.meta,
+      i18n: settings.site.i18n[settings.site.meta.lang],
+      user: user ? user.toJson() : null,
+      shots: shots,
+      paging: {
+        name: '/my/bookmarks',
+        current: page,
+        max: Math.ceil(count / 10)
+      }
+    };
+  
+    await ctx.render('page-recent', data);
+  });
+
+  //
+  // my bookmark paging
+  //
+  router.get('/my/bookmarks/:page', async (ctx) => {
+    await db.ready();
+    const user = await findCurrentUser(ctx);
+
+    if (!user) {
+      ctx.redirect('/');
+      return;
+    }
+
+    const page = parseInt(ctx.request.params.page);
+    if (isNaN(page) || page < 2 || page != ctx.request.params.page) {
+      ctx.redirect('/my/bookmarks');
+      return;
+    }
+
+    const count = await countUserBookmarks(user.id);
+    if ((page - 1) * 10 > count) {
+      ctx.redirect('/my/bookmarks');
+      return;
+    }
+
+    const books = await findUserBookmarks(user.id, 10, 10 * (page - 1));
+
+    const shots = [];
+    for (let i = 0; i < books.length; i++) {
+      const bookFlatten = books[i].toJson();
+      shots.push(bookFlatten.shot);
+    }
+
+    const data = {
+      meta: settings.site.meta,
+      i18n: settings.site.i18n[settings.site.meta.lang],
+      user: user ? user.toJson() : null,
+      shots: shots,
+      paging: {
+        name: '/my/bookmarks',
+        current: page,
+        max: Math.ceil(count / 10)
+      }
+    };
+  
+    await ctx.render('page-recent', data);
+  });
+
+  //
+  // my flag
+  //
+  router.get('/my/flags', async (ctx) => {
+    await db.ready();
+    const user = await findCurrentUser(ctx);
+
+    if (!user) {
+      ctx.redirect('/');
+      return;
+    }
+
+    const page = 1;
+    const flags = await findUserFlags(user.id, 10, 10 * (page - 1));
+    const count = await countUserFlags(user.id);
+
+    // extract shot data from flag data
+    const shots = [];
+    for (let i = 0; i < flags.length; i++) {
+      const bookFlatten = flags[i].toJson();
+      shots.push(bookFlatten.shot);
+    }
+
+    // since shot data is flatten already, just use it
+    const data = {
+      meta: settings.site.meta,
+      i18n: settings.site.i18n[settings.site.meta.lang],
+      user: user ? user.toJson() : null,
+      shots: shots,
+      paging: {
+        name: '/my/flags',
+        current: page,
+        max: Math.ceil(count / 10)
+      }
+    };
+  
+    await ctx.render('page-recent', data);
+  });
+
+  //
+  // my flag paging
+  //
+  router.get('/my/flags/:page', async (ctx) => {
+    await db.ready();
+    const user = await findCurrentUser(ctx);
+
+    if (!user) {
+      ctx.redirect('/');
+      return;
+    }
+
+    const page = parseInt(ctx.request.params.page);
+    if (isNaN(page) || page < 2 || page != ctx.request.params.page) {
+      ctx.redirect('/my/flags');
+      return;
+    }
+
+    const count = await countUserFlags(user.id);
+    if ((page - 1) * 10 > count) {
+      ctx.redirect('/my/flags');
+      return;
+    }
+
+    const flags = await findUserFlags(user.id, 10, 10 * (page - 1));
+
+    const shots = [];
+    for (let i = 0; i < flags.length; i++) {
+      const bookFlatten = flags[i].toJson();
+      shots.push(bookFlatten.shot);
+    }
+
+    const data = {
+      meta: settings.site.meta,
+      i18n: settings.site.i18n[settings.site.meta.lang],
+      user: user ? user.toJson() : null,
+      shots: shots,
+      paging: {
+        name: '/my/flags',
+        current: page,
+        max: Math.ceil(count / 10)
+      }
+    };
+  
+    await ctx.render('page-recent', data);
+  });
+
+  //
+  // login page
+  //
   router.get('/login', async (ctx) => {
     await db.ready();
     const user = await findCurrentUser(ctx);
@@ -419,13 +807,17 @@ module.exports = function setupRouter (router, settings) {
     await ctx.render('page-login', data);
   });
 
-  ////// logout page
+  //
+  // logout page
+  //
   router.get('/logout', async (ctx) => {
     ctx.session = null;
     ctx.redirect('/');
   });
 
-  ////// oauth callback
+  //
+  // oauth callback
+  //
   router.get(settings.oauth.server.callback, async (ctx) => {
     // no session data
     if (!ctx.session || !ctx.session.grant) {
@@ -473,20 +865,18 @@ module.exports = function setupRouter (router, settings) {
       if (oauthResult.provider == 'github') {
         newUser = {
           username: userProfile.login,
-          nickname: userProfile.name,
-          twitter_id: null,
+          name: userProfile.name,
           github_id: userProfile.id,
-          is_mod: false,
+          github_avatar: userProfile.avatar_url,
           created: new Date(),
           updated: new Date()
         };
       } else if (oauthResult.provider == 'twitter') {
         newUser = {
           username: userProfile.screen_name,
-          nickname: userProfile.name,
+          name: userProfile.name,
           twitter_id: userProfile.id,
-          github_id: null,
-          is_mod: false,
+          twitter_avatar: userProfile.profile_image_url_https,
           created: new Date(),
           updated: new Date()
         };

@@ -5,7 +5,7 @@ module.exports = function database_seed () {
   this.seed(async (db) => {
     const userModel = db.Model('users');
     const shotModel = db.Model('shots');
-    const noteModel = db.Model('notes');
+    const bookModel = db.Model('bookmarks');
     const flagModel = db.Model('flags');
 
     const userIDList = [];
@@ -42,7 +42,7 @@ module.exports = function database_seed () {
         text: text,
         text_romanized: text,
         user_id: userIDList[Math.floor(Math.random() * userIDList.length)],
-        note_count: 0,
+        bookmark_count: 0,
         flag_count: 0,
         created: faker.date.recent(),
         updated: faker.date.recent()
@@ -58,29 +58,29 @@ module.exports = function database_seed () {
 
     i = 0;
     while (i < 200) {
-      let note = {
+      let bookmark = {
         user_id: userIDList[Math.floor(Math.random() * userIDList.length)],
         shot_id: shotIDList[Math.floor(Math.random() * shotIDList.length)],
         created: faker.date.recent(),
         updated: faker.date.recent()
       }
 
-      const noteCount = await noteModel.where({ user_id: note.user_id, shot_id: note.shot_id }).count();
+      const bookCount = await bookModel.where({ user_id: bookmark.user_id, shot_id: bookmark.shot_id }).count();
 
-      if (noteCount != 0) {
+      if (bookCount != 0) {
         continue;
       }
 
-      note = await noteModel.create(note);
+      bookmark = await bookModel.create(bookmark);
 
-      let shot = await shotModel.find(note.shot_id);
-      shot.note_count = shot.note_count + 1;
+      let shot = await shotModel.find(bookmark.shot_id);
+      shot.bookmark_count = shot.bookmark_count + 1;
       await shot.save();
 
       i++;
     }
 
-    console.log('seed step: generate note data and insert');
+    console.log('seed step: generate bookmark data and insert');
 
     i = 0;
     while (i < 20) {

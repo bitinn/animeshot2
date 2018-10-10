@@ -8,12 +8,15 @@ div.column.col-2.col-md-3.col-sm-4.col-xs-12
       li.nav-item(class=(paging.name == "/login") ? "active" : "")
         a(href="/login") #{i18n.login}
     else
+      if user.is_mod
+        li.nav-item(class=(paging.name == "/management") ? "active" : "")
+          a(href="/management") #{i18n.manage}
       li.nav-item(class=(paging.name == "/my") ? "active" : "")
-        a(href="/my") #{i18n.my}
+        a(href="/my") #{i18n.shot_icon} #{i18n.my}
       ul.nav
-        li.nav-item(class=(paging.name == "/my/likes") ? "active" : "")
-          a(href="/my/likes") #{i18n.likes}
+        li.nav-item(class=(paging.name == "/my/bookmarks") ? "active" : "")
+          a(href="/my/bookmarks") #{i18n.bookmark_icon} #{i18n.bookmarks}
         li.nav-item(class=(paging.name == "/my/flags") ? "active" : "")
-          a(href="/my/flags") #{i18n.flags}
+          a(href="/my/flags") #{i18n.flag_icon} #{i18n.flags}
         li.nav-item
           a(href="/logout") #{i18n.logout}

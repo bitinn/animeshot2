@@ -2,8 +2,8 @@
   "site": {
     "meta": {
       "title": "AnimeShot",
-      "owner": "....",
-      "tagline": "....",
+      "owner": "...",
+      "tagline": "...",
       "logo": "/images/animeshot.jpg",
       "lang": "en"
     },
@@ -11,60 +11,88 @@
       "en": {
         "recent": "Recent",
         "top": "Top",
+        "manage": "Manage",
         "login": "Login",
-        "my": "📷 My Uploads",
-        "likes": "👍 Likes",
-        "flags": "⛳ Flags",
+        "my": "My Uploads",
+        "bookmarks": "Bookmarks",
+        "flags": "Flags",
         "logout": "Logout",
-        "like": "👍 Like",
-        "flag": "⛳ Flag",
-        "source": "🤔 Source",
-        "delete": "❌ Delete",
+        "bookmark": "Add to Bookmarks",
+        "flag": "Flag this Shot",
+        "source": "Source",
+        "delete": "Delete",
+        "shot_icon": "📷",
+        "bookmark_icon": "🔖",
+        "flag_icon": "⛳",
+        "source_icon": "🔎",
+        "delete_icon": "❌",
         "keyword": "Keyword",
-        "search": "Search"
+        "search": "Search",
+        "previous": "Prev",
+        "next": "Next",
+        "more": "More Recent Uploads",
+        "no_upload": "You don't have any uploads yet.",
+        "no_bookmarks": "You don't have any bookmarks yet.",
+        "no_flags": "You don't have any flags yet.",
+        "login_with_twitter": "Login with Twitter",
+        "login_with_github": "Login with GitHub"
       },
       "zh": {
         "recent": "近期上传",
         "top": "热门上传",
+        "manage": "管理上传",
         "login": "登入",
-        "my": "📷 我的上传",
-        "likes": "👍 喜爱内容",
-        "flags": "⛳ 插旗内容",
+        "my": "我的上传",
+        "bookmarks": "收藏内容",
+        "flags": "插旗内容",
         "logout": "登出账户",
-        "like": "👍 喜爱",
-        "flag": "⛳ 插旗",
-        "source": "🤔 出处",
-        "delete": "❌ 删除",
+        "bookmark": "加入收藏",
+        "flag": "插旗待审",
+        "source": "出处",
+        "delete": "删除",
+        "shot_icon": "📷",
+        "bookmark_icon": "🔖",
+        "flag_icon": "⛳",
+        "source_icon": "🔎",
+        "delete_icon": "❌",
         "keyword": "关键词",
-        "search": "搜索"
+        "search": "搜索",
+        "previous": "上一页",
+        "next": "下一页",
+        "more": "更多近期上传",
+        "no_upload": "你还没有上传内容",
+        "no_bookmarks": "你还没有收藏内容",
+        "no_flags": "你还没有插旗内容",
+        "login_with_twitter": "使用 Twitter 登陆",
+        "login_with_github": "使用 GitHub 登陆"
       }
     },
     "dev": true,
-    "port": 80
+    "port": 3000
   },
   "cookie": {
-    "keys": ["...."],
+    "keys": ["test secret"],
     "session": {
-      "signed": false,
-      "maxAge": 604800,
+      "signed": true,
+      "maxAge": 86400000,
       "key": "animeshot:login"
     }
   },
   "oauth": {
     "server": {
       "protocol": "http",
-      "host": "as2.bitinn.net",
+      "host": "localhost:3000",
       "callback": "/oauth/callback",
       "transport": "session",
       "state": true
     },
     "twitter": {
-      "key": "....",
-      "secret": "...."
+      "key": "...",
+      "secret": "..."
     },
     "github": {
-      "key": "....",
-      "secret": "...."
+      "key": "...",
+      "secret": "..."
     }
   }
 }
