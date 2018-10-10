@@ -1,0 +1,27 @@
+div.column.col-2.col-md-3.col-sm-4.col-xs-12
+div.column.column.col-10.col-md-9.col-sm-8.col-xs-12.text-center
+  div.d-inline-block.text-left
+    ul.pagination
+      //- previous page
+      if paging.current == 1
+        li.page-item.disabled
+          span #{i18n.previous}
+      else
+        li.page-item
+          a(href=paging.name + "/" + (paging.current - 1)) #{i18n.previous}
+      //- no page number
+      if paging.current != 1
+        li.page-item
+          span ...
+      li.page-item.active
+        a(href=paging.name + "/" + paging.current) #{paging.current}
+      if shots.length != 0
+        li.page-item
+          span ...
+      //- next page
+      if shots.length == 0
+        li.page-item.disabled
+          span #{i18n.next}
+      else
+        li.page-item
+          a(href=paging.name + "/" + (paging.current + 1)) #{i18n.next}

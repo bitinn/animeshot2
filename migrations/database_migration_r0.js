@@ -14,7 +14,7 @@ module.exports = function database_migration_r0 () {
     this.integer('id', { primary: true, not_null: true });
     this.string('hash', { unique: true, not_null: true });
     this.string('text');
-    this.string('text_romanized');
+    this.string('romanized');
     this.integer('user_id', { not_null: true, references: 'users.id' });
     this.integer('bookmark_count', { default: 0 });
     this.integer('flag_count', { default: 0 });

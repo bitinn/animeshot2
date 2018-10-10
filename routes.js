@@ -6,6 +6,8 @@ const request = require('request');
 const promise = Promise;
 const purest = require('purest')({ request, promise });
 const providers = require('@purest/providers');
+const pinyin = require('pinyin');
+const hepburn = require('hepburn');
 
 // define database
 
@@ -153,6 +155,13 @@ async function countUserFlags (id = 0) {
   const count = await flagModel.where({ user_id: id }).count();
 
   return count;
+}
+
+async function searchShots (text, limit = 0, offset = 0) {
+  const shotModel = db.Model('shots');
+  const shots = await shotModel.where({ romanized_like: text }).order('created', true).limit(limit, offset).include('user');
+
+  return shots;
 }
 
 //
@@ -813,6 +822,145 @@ module.exports = function setupRouter (router, settings) {
   router.get('/logout', async (ctx) => {
     ctx.session = null;
     ctx.redirect('/');
+  });
+
+  //
+  // search redirect
+  //
+  router.get('/search', async (ctx) => {
+    const query = ctx.request.query.q;
+
+    if (!query) {
+      ctx.redirect('/');
+      return;
+    }
+
+    ctx.redirect('/search/' + query);
+  });
+
+  //
+  // search page
+  //
+  router.get('/search/:keyword', async (ctx) => {
+    const search = ctx.request.params.keyword;
+
+    if (!search) {
+      ctx.redirect('/');
+      return;
+    }
+
+    // romanize hanzi into phonetic notation
+    const searchArray = pinyin(search, {
+      style: pinyin.STYLE_TONE2,
+      segment: true
+    });
+
+    // flatten array, trim whitespace, split non-han words, convert kana into romaji
+    const searchWords = [];
+    searchArray.forEach(a => {
+      if (a.length < 1) {
+        return;
+      }
+
+      let words = a[0].trim().split(' ');
+      words.forEach(s => {
+        if (s.length < 1) {
+          return;
+        }
+
+        if (!hepburn.containsKana(s)) {
+          searchWords.push(s.toLowerCase());
+          return;
+        }
+
+        searchWords.push(hepburn.fromKana(s).toLowerCase());
+      });
+    });
+
+    // join into a search string
+    const text = searchWords.join(' ');
+
+    await db.ready();
+    const page = 1;
+    const user = await findCurrentUser(ctx);
+    const shots = await searchShots(text, 10, 10 * (page - 1));
+
+    const data = {
+      meta: settings.site.meta,
+      i18n: settings.site.i18n[settings.site.meta.lang],
+      user: user ? user.toJson() : null,
+      shots: shots ? shots.toJson() : [],
+      paging: {
+        name: '/search/' + search,
+        current: page
+      },
+      search: search
+    };
+  
+    await ctx.render('page-search', data);
+  });
+
+  //
+  // search paging
+  //
+  router.get('/search/:keyword/:page', async (ctx) => {
+    const search = ctx.request.params.keyword;
+
+    if (!search) {
+      ctx.redirect('/');
+      return;
+    }
+
+    const page = parseInt(ctx.request.params.page);
+    if (isNaN(page) || page < 2 || page != ctx.request.params.page) {
+      ctx.redirect('/search/' + search);
+      return;
+    }
+
+    const searchArray = pinyin(search, {
+      style: pinyin.STYLE_TONE2,
+      segment: true
+    });
+
+    const searchWords = [];
+    searchArray.forEach(a => {
+      if (a.length < 1) {
+        return;
+      }
+
+      let words = a[0].trim().split(' ');
+      words.forEach(s => {
+        if (s.length < 1) {
+          return;
+        }
+
+        if (!hepburn.containsKana(s)) {
+          searchWords.push(s.toLowerCase());
+          return;
+        }
+
+        searchWords.push(hepburn.fromKana(s).toLowerCase());
+      });
+    });
+
+    const text = searchWords.join(' ');
+
+    await db.ready();
+    const user = await findCurrentUser(ctx);
+    const shots = await searchShots(text, 10, 10 * (page - 1));
+
+    const data = {
+      meta: settings.site.meta,
+      i18n: settings.site.i18n[settings.site.meta.lang],
+      user: user ? user.toJson() : null,
+      shots: shots ? shots.toJson() : [],
+      paging: {
+        name: '/search/' + search,
+        current: page
+      }
+    };
+  
+    await ctx.render('page-search', data);
   });
 
   //

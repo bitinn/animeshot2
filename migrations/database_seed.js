@@ -40,7 +40,7 @@ module.exports = function database_seed () {
       let shot = {
         hash: faker.internet.password().replace(/\s+/g, ''),
         text: text,
-        text_romanized: text,
+        romanized: text,
         user_id: userIDList[Math.floor(Math.random() * userIDList.length)],
         bookmark_count: 0,
         flag_count: 0,
