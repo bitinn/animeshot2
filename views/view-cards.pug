@@ -19,8 +19,15 @@ div.column.col-10.col-md-9.col-sm-8.col-xs-12
                 span
                   a.text-dark(href="/user/" + shot.user.username) #{shot.user.name}
           div.card-footer
-            form(action="/action/shot")
-              button.btn.btn-sm.m-1.tooltip(type="submit" data-tooltip=i18n.bookmark) #{i18n.bookmark_icon} #{shot.bookmark_count}
+            form(method="post" enctype="multipart/form-data")
+              button.btn.btn-sm.m-1.tooltip(
+                class=(shot.bookmark && shot.bookmark.length > 0) ? "active" : ""
+                type="submit"
+                name="bookmark"
+                formaction="/action/bookmark"
+                value=shot.id
+                data-tooltip=i18n.bookmark
+              ) #{i18n.bookmark_icon} #{shot.bookmark_count}
               button.btn.btn-sm.btn-secondary.m-1.tooltip(type="submit" data-tooltip=i18n.flag) #{i18n.flag_icon} #{shot.flag_count}
               a.btn.btn-sm.btn-secondary.m-1(href="#" target="_blank") #{i18n.source_icon} #{i18n.source}
               if user && user.is_mod

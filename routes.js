@@ -19,13 +19,15 @@ const db = new openrecord({
 });
 
 db.Model('users', function () {
-  this.hasMany('shot', { to: 'user_id' });
-  this.hasMany('bookmark', { to: 'user_id' });
-  this.hasMany('flag', { to: 'user_id' });
+  this.hasMany('shot', { model: 'shots', from: 'id', to: 'user_id' });
+  this.hasMany('bookmark', { model: 'bookmarks', from: 'id', to: 'user_id' });
+  this.hasMany('flag', { model: 'flags', from: 'id', to: 'user_id' });
 });
 
 db.Model('shots', function () {
   this.belongsTo('user', { model: 'users', from: 'user_id', to: 'id' });
+  this.hasMany('bookmark', { model: 'bookmarks', from: 'id', to: 'shot_id' });
+  this.hasMany('flag', { model: 'flags', from: 'id', to: 'shot_id' });
 });
 
 db.Model('bookmarks', function () {
@@ -73,9 +75,16 @@ async function findUserByName (username) {
   return user;
 }
 
-async function findRecentShots (limit = 0, offset = 0) {
+async function findShot (id) {
   const shotModel = db.Model('shots');
-  const shots = await shotModel.order('created', true).limit(limit, offset).include('user');
+  const shot = await shotModel.find(id);
+
+  return shot;
+}
+
+async function findRecentShots (id, limit = 0, offset = 0) {
+  const shotModel = db.Model('shots');
+  const shots = await shotModel.order('created', true).limit(limit, offset).include(['user', 'bookmark']).where({ bookmark: { user_id: id } });
 
   return shots;
 }
@@ -164,6 +173,41 @@ async function searchShots (text, limit = 0, offset = 0) {
   return shots;
 }
 
+async function findBookmark (user, shot) {
+  const bookModel = db.Model('bookmarks');
+  const bookmark = await bookModel.where({ user_id: user.id, shot_id: shot.id }).first();
+
+  return bookmark;
+}
+
+async function createBookmark (user, shot) {
+  let bookmark = {
+    user_id: user.id,
+    shot_id: shot.id,
+    created: new Date(),
+    updated: new Date()
+  };
+
+  const bookModel = db.Model('bookmarks');
+  bookmark = await bookModel.create(bookmark);
+
+  shot.bookmark_count = shot.bookmark_count + 1;
+  await shot.save();
+
+  return bookmark;
+}
+
+async function deleteBookmark (bookmark, shot) {
+  await bookmark.delete();
+
+  shot.bookmark_count = shot.bookmark_count - 1;
+  if (shot.bookmark_count < 0) {
+    shot.bookmark_count = 0;
+  }
+
+  await shot.save();
+}
+
 //
 // define routes
 //
@@ -175,7 +219,7 @@ module.exports = function setupRouter (router, settings) {
   router.get('/', async (ctx) => {
     await db.ready();
     const user = await findCurrentUser(ctx);
-    const shots = await findRecentShots(4, 0);
+    const shots = await findRecentShots(user.id, 4, 0);
 
     // toJson flatten db result into plain object
     const data = {
@@ -198,7 +242,7 @@ module.exports = function setupRouter (router, settings) {
     await db.ready();
     const page = 1;
     const user = await findCurrentUser(ctx);
-    const shots = await findRecentShots(10, 10 * (page - 1));
+    const shots = await findRecentShots(user.id, 10, 10 * (page - 1));
     const count = await countShots();
 
     const data = {
@@ -236,7 +280,7 @@ module.exports = function setupRouter (router, settings) {
     }
 
     const user = await findCurrentUser(ctx);
-    const shots = await findRecentShots(10, 10 * (page - 1));
+    const shots = await findRecentShots(user.id, 10, 10 * (page - 1));
 
     const data = {
       meta: settings.site.meta,
@@ -961,6 +1005,44 @@ module.exports = function setupRouter (router, settings) {
     };
   
     await ctx.render('page-search', data);
+  });
+
+  //
+  // create bookmark
+  //
+  router.post('/action/bookmark', async (ctx) => {
+    await db.ready();
+    const user = await findCurrentUser(ctx);
+
+    // not login, go there
+    if (!user) {
+      ctx.redirect('/login');
+      return;
+    }
+
+    // find shot
+    const id = ctx.request.body.bookmark;
+    const shot = await findShot(id);
+
+    // shot not found
+    if (!shot) {
+      ctx.redirect('/');
+      return;
+    }
+
+    // find bookmark
+    const bookmark = await findBookmark(user, shot);
+
+    // delete if found
+    if (bookmark != null) {
+      await deleteBookmark(bookmark, shot);
+
+    // create if none
+    } else {
+      const bookmark = await createBookmark(user, shot);
+    }
+
+    ctx.redirect('back');
   });
 
   //
