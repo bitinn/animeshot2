@@ -20,6 +20,7 @@ div.column.col-10.col-md-9.col-sm-8.col-xs-12
                   a.text-dark(href="/user/" + shot.user.username) #{shot.user.name}
           div.card-footer
             form(method="post" enctype="multipart/form-data")
+              input(type="hidden", name='_csrf', value=csrf)
               button.btn.btn-sm.m-1.tooltip(
                 class=(shot.bookmark && shot.bookmark.length > 0) ? "active" : ""
                 type="submit"

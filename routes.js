@@ -320,7 +320,8 @@ module.exports = function setupRouter (router, settings) {
       shots: shots ? shots.toJson() : [],
       paging: {
         name: '/index',
-      }
+      },
+      csrf: ctx.csrf
     };
   
     await ctx.render('page-index', data);
@@ -346,7 +347,8 @@ module.exports = function setupRouter (router, settings) {
         name: '/recent',
         current: page,
         max: Math.ceil(count / 10)
-      }
+      },
+      csrf: ctx.csrf
     };
   
     await ctx.render('page-recent', data);
@@ -384,7 +386,8 @@ module.exports = function setupRouter (router, settings) {
         name: '/recent',
         current: page,
         max: Math.ceil(count / 10)
-      }
+      },
+      csrf: ctx.csrf
     };
   
     await ctx.render('page-recent', data);
@@ -410,7 +413,8 @@ module.exports = function setupRouter (router, settings) {
         name: '/top',
         current: page,
         max: Math.ceil(count / 10)
-      }
+      },
+      csrf: ctx.csrf
     };
   
     await ctx.render('page-recent', data);
@@ -447,7 +451,8 @@ module.exports = function setupRouter (router, settings) {
         name: '/top',
         current: page,
         max: Math.ceil(count / 10)
-      }
+      },
+      csrf: ctx.csrf
     };
   
     await ctx.render('page-recent', data);
@@ -485,7 +490,8 @@ module.exports = function setupRouter (router, settings) {
         name: '/management',
         current: page,
         max: Math.ceil(count / 10)
-      }
+      },
+      csrf: ctx.csrf
     };
   
     await ctx.render('page-recent', data);
@@ -532,7 +538,8 @@ module.exports = function setupRouter (router, settings) {
         name: '/management',
         current: page,
         max: Math.ceil(count / 10)
-      }
+      },
+      csrf: ctx.csrf
     };
   
     await ctx.render('page-recent', data);
@@ -567,7 +574,8 @@ module.exports = function setupRouter (router, settings) {
         name: '/user/' + username,
         current: page,
         max: Math.ceil(count / 10)
-      }
+      },
+      csrf: ctx.csrf
     };
   
     await ctx.render('page-recent', data);
@@ -612,7 +620,8 @@ module.exports = function setupRouter (router, settings) {
         name: '/user/' + username,
         current: page,
         max: Math.ceil(count / 10)
-      }
+      },
+      csrf: ctx.csrf
     };
   
     await ctx.render('page-recent', data);
@@ -643,7 +652,8 @@ module.exports = function setupRouter (router, settings) {
         name: '/my',
         current: page,
         max: Math.ceil(count / 10)
-      }
+      },
+      csrf: ctx.csrf
     };
   
     await ctx.render('page-recent', data);
@@ -684,7 +694,8 @@ module.exports = function setupRouter (router, settings) {
         name: '/my',
         current: page,
         max: Math.ceil(count / 10)
-      }
+      },
+      csrf: ctx.csrf
     };
   
     await ctx.render('page-recent', data);
@@ -725,7 +736,8 @@ module.exports = function setupRouter (router, settings) {
         name: '/my/bookmarks',
         current: page,
         max: Math.ceil(count / 10)
-      }
+      },
+      csrf: ctx.csrf
     };
   
     await ctx.render('page-recent', data);
@@ -772,7 +784,8 @@ module.exports = function setupRouter (router, settings) {
         name: '/my/bookmarks',
         current: page,
         max: Math.ceil(count / 10)
-      }
+      },
+      csrf: ctx.csrf
     };
   
     await ctx.render('page-recent', data);
@@ -811,7 +824,8 @@ module.exports = function setupRouter (router, settings) {
         name: '/my/flags',
         current: page,
         max: Math.ceil(count / 10)
-      }
+      },
+      csrf: ctx.csrf
     };
   
     await ctx.render('page-recent', data);
@@ -858,7 +872,8 @@ module.exports = function setupRouter (router, settings) {
         name: '/my/flags',
         current: page,
         max: Math.ceil(count / 10)
-      }
+      },
+      csrf: ctx.csrf
     };
   
     await ctx.render('page-recent', data);
@@ -964,7 +979,8 @@ module.exports = function setupRouter (router, settings) {
         name: '/search/' + search,
         current: page
       },
-      search: search
+      search: search,
+      csrf: ctx.csrf
     };
   
     await ctx.render('page-search', data);
@@ -1028,7 +1044,9 @@ module.exports = function setupRouter (router, settings) {
       paging: {
         name: '/search/' + search,
         current: page
-      }
+      },
+      search: search,
+      csrf: ctx.csrf
     };
   
     await ctx.render('page-search', data);

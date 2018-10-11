@@ -10,6 +10,7 @@ const koaRouter = require('koa-trie-router');
 const koaSession = require('koa-session');
 const koaMount = require('koa-mount');
 const koaBody = require('koa-body');
+const koaCSRF = require('koa-csrf');
 
 const grant = require('grant-koa');
 
@@ -37,6 +38,7 @@ app.use(koaBody({
   json: false,
   strict: true
 }));
+app.use(new koaCSRF());
 
 app.keys = settings.cookie.keys;
 app.use(koaSession(settings.cookie.session, app));
