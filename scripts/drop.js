@@ -4,11 +4,11 @@
 const prompt = require('promptly');
 const openrecord = require('openrecord/store/sqlite3');
 
-async function resetDatabase () {
+async function dropDatabase () {
   const answer = await prompt.confirm('This will DELETE ALL TABLES from the animeshot database, only proceed if you are testing locally or have backed up the sqlite file, PROCEED? (y/n)');
 
   if (!answer) {
-    console.log('database reset aborted');
+    console.log('database drop aborted');
     return;
   }
 
@@ -30,6 +30,6 @@ async function resetDatabase () {
   db.close();
 }
 
-resetDatabase().catch((err) => {
+dropDatabase().catch((err) => {
   console.log(err);
 });

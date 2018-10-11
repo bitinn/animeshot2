@@ -36,9 +36,19 @@ div.column.col-10.col-md-9.col-sm-8.col-xs-12
                 value=shot.id
                 data-tooltip=i18n.flag
               ) #{i18n.flag_icon} #{shot.flag_count}
-              a.btn.btn-sm.btn-secondary.m-1(href="#" target="_blank") #{i18n.source_icon} #{i18n.source}
+              a.btn.btn-sm.btn-secondary.m-1.tooltip(
+                href="#"
+                target="_blank"
+                data-tooltip=i18n.source_tooltip
+              ) #{i18n.source_icon} #{i18n.source}
               if user && user.is_mod
-                button.btn.btn-sm.btn-secondary.m-1(type="submit") #{i18n.delete_icon} #{i18n.delete}
+                button.btn.btn-sm.btn-secondary.m-1.tooltip(
+                  type="submit"
+                  name="shot"
+                  formaction="/action/shot"
+                  value=shot.id
+                  data-tooltip=i18n.delete_tooltip
+                ) #{i18n.delete_icon} #{i18n.delete}
     else
       div.column.col-12.text-center
         if paging.name == "/my"

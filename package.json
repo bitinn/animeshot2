@@ -6,10 +6,11 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon --ext js,pug,json index.js",
-    "db:setup": "node ./scripts/setup.js",
+    "db:migrate": "node ./scripts/migrate.js",
     "db:reset": "node ./scripts/reset.js",
     "db:seed": "node ./scripts/seed.js",
-    "db:drop": "node ./scripts/drop.js"
+    "db:drop": "node ./scripts/drop.js",
+    "db:mod": "node ./scripts/mod.js"
   },
   "repository": {
     "type": "git",

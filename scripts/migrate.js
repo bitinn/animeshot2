@@ -4,7 +4,7 @@
 const prompt = require('promptly');
 const openrecord = require('openrecord/store/sqlite3');
 
-async function setupDatabase () {
+async function migrateDatabase () {
   const answer = await prompt.confirm('This will SETUP AND ALTER TABLES in the animeshot database to current version, make sure you have backed up the sqlite file, PROCEED? (y/n)');
 
   if (!answer) {
@@ -23,6 +23,7 @@ async function setupDatabase () {
       require('../migrations/database_migration_r4'),
       require('../migrations/database_migration_r5'),
       require('../migrations/database_migration_r6'),
+      require('../migrations/database_migration_r7'),
     ]
   });
 
@@ -32,6 +33,6 @@ async function setupDatabase () {
   db.close();
 }
 
-setupDatabase().catch((err) => {
+migrateDatabase().catch((err) => {
   console.log(err);
 });
