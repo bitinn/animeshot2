@@ -1174,6 +1174,27 @@ module.exports = function setupRouter (router, settings) {
   });
 
   //
+  // upload shot
+  //
+  router.post('/action/upload', async (ctx) => {
+    await db.ready();
+    const user = await findCurrentUser(ctx);
+
+    if (!user) {
+      ctx.redirect('/login');
+      return;
+    }
+
+    const shot = ctx.request.files.shot;
+    const text = ctx.request.body.text;
+
+    console.log(shot);
+    console.log(text);
+
+    ctx.redirect('back');
+  });
+
+  //
   // oauth callback
   //
   router.get(settings.oauth.server.callback, async (ctx) => {

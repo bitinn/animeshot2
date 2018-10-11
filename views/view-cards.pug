@@ -1,4 +1,6 @@
 div.column.col-10.col-md-9.col-sm-8.col-xs-12
+  if paging.name == "/index"
+    include view-upload.pug
   div.columns
     each shot in shots
       div.column.col-6.col-sm-12.mt-2
