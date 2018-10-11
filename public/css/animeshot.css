@@ -13,15 +13,7 @@
   box-shadow: 0 0 0 0.1rem #f8f9fa;
 }
 
-.btn-secondary:active {
+.btn-secondary:active, .btn-secondary.active {
   background-color: #50596c;
   color: #fff;
-}
-
-.pagination-wrapper {
-
-}
-
-.pagination-adapt {
-
 }

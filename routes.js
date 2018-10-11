@@ -84,7 +84,7 @@ async function findShot (id) {
 
 async function findRecentShots (id, limit = 0, offset = 0) {
   const shotModel = db.Model('shots');
-  const shots = await shotModel.order('created', true).limit(limit, offset).include(['user', 'bookmark']).where({ bookmark: { user_id: id } });
+  const shots = await shotModel.order('created', true).limit(limit, offset).include(['user', 'bookmark', 'flag']).where({ bookmark: { user_id: id }, flag: { user_id: id } });
 
   return shots;
 }
@@ -203,6 +203,41 @@ async function deleteBookmark (bookmark, shot) {
   shot.bookmark_count = shot.bookmark_count - 1;
   if (shot.bookmark_count < 0) {
     shot.bookmark_count = 0;
+  }
+
+  await shot.save();
+}
+
+async function findFlag (user, shot) {
+  const flagModel = db.Model('flags');
+  const flag = await flagModel.where({ user_id: user.id, shot_id: shot.id }).first();
+
+  return flag;
+}
+
+async function createFlag (user, shot) {
+  let flag = {
+    user_id: user.id,
+    shot_id: shot.id,
+    created: new Date(),
+    updated: new Date()
+  };
+
+  const flagModel = db.Model('flags');
+  flag = await flagModel.create(flag);
+
+  shot.flag_count = shot.flag_count + 1;
+  await shot.save();
+
+  return flag;
+}
+
+async function deleteFlag (flag, shot) {
+  await flag.delete();
+
+  shot.flag_count = shot.flag_count - 1;
+  if (shot.flag_count < 0) {
+    shot.flag_count = 0;
   }
 
   await shot.save();
@@ -1039,7 +1074,42 @@ module.exports = function setupRouter (router, settings) {
 
     // create if none
     } else {
-      const bookmark = await createBookmark(user, shot);
+      await createBookmark(user, shot);
+    }
+
+    ctx.redirect('back');
+  });
+
+  //
+  // create flag
+  //
+  router.post('/action/flag', async (ctx) => {
+    await db.ready();
+    const user = await findCurrentUser(ctx);
+
+    if (!user) {
+      ctx.redirect('/login');
+      return;
+    }
+
+    const id = ctx.request.body.flag;
+    const shot = await findShot(id);
+
+    if (!shot) {
+      ctx.redirect('/');
+      return;
+    }
+
+    // find flag
+    const flag = await findFlag(user, shot);
+
+    // delete if found
+    if (flag != null) {
+      await deleteFlag(flag, shot);
+
+    // create if none
+    } else {
+      await createFlag(user, shot);
     }
 
     ctx.redirect('back');
