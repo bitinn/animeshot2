@@ -62,3 +62,4 @@ typings/
 
 ##### animeshot specific #####
 animeshot.json
+.DS_Store

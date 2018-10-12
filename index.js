@@ -36,7 +36,10 @@ app.use(koaBody({
   urlencoded: false,
   text: false,
   json: false,
-  strict: true
+  strict: true,
+  formidable: {
+    maxFileSize: 20 * 1024 * 1024
+  }
 }));
 app.use(new koaCSRF());
 

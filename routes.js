@@ -8,6 +8,9 @@ const purest = require('purest')({ request, promise });
 const providers = require('@purest/providers');
 const pinyin = require('pinyin');
 const hepburn = require('hepburn');
+const sharp = require('sharp');
+const cuid = require('cuid');
+const createDirectory = require('make-dir');
 
 // define models
 
@@ -50,10 +53,53 @@ db.Model('flags', function () {
 const githubAPI = purest({ provider: 'github', config: providers });
 const twitterAPI = purest({ provider: 'twitter', config: providers });
 
-// workaround: disable custom inspect function when using console.log()
+// workaround: disable custom inspect function when using console log
 
 const util = require('util');
 util.inspect.defaultOptions.customInspect = false;
+
+//
+// helper functions
+//
+
+function romanize (text) {
+  // romanize hanzi into phonetic notation
+  const textArray = pinyin(text, {
+    style: pinyin.STYLE_TONE2,
+    segment: true
+  });
+
+  // flatten array
+  // trim whitespace
+  // lowercase letters
+  // split non-han words
+  // convert kana into romaji
+  const textArrayFlatten = [];
+  textArray.forEach(a => {
+    if (a.length < 1) {
+      return;
+    }
+
+    let words = a[0].trim().split(' ');
+    words.forEach(s => {
+      if (s.length < 1) {
+        return;
+      }
+
+      if (!hepburn.containsKana(s)) {
+        textArrayFlatten.push(s.toLowerCase());
+        return;
+      }
+
+      textArrayFlatten.push(hepburn.fromKana(s).toLowerCase());
+    });
+  });
+
+  // join array into a string
+  const textRomanized = textArrayFlatten.join(' ');
+
+  return textRomanized;
+}
 
 //
 // database helper functions
@@ -298,6 +344,13 @@ async function createUser (oauthResult, userProfile) {
   return newUser;
 }
 
+async function createShot (shot) {
+  const shotModel = db.Model('shots');
+  shot = await shotModel.create(shot);
+
+  return shot;
+}
+
 //
 // define routes
 //
@@ -321,7 +374,8 @@ module.exports = function setupRouter (router, settings) {
       paging: {
         name: '/index',
       },
-      csrf: ctx.csrf
+      csrf: ctx.csrf,
+      service: settings.site.service
     };
   
     await ctx.render('page-index', data);
@@ -348,7 +402,8 @@ module.exports = function setupRouter (router, settings) {
         current: page,
         max: Math.ceil(count / 10)
       },
-      csrf: ctx.csrf
+      csrf: ctx.csrf,
+      service: settings.site.service
     };
   
     await ctx.render('page-recent', data);
@@ -387,7 +442,8 @@ module.exports = function setupRouter (router, settings) {
         current: page,
         max: Math.ceil(count / 10)
       },
-      csrf: ctx.csrf
+      csrf: ctx.csrf,
+      service: settings.site.service
     };
   
     await ctx.render('page-recent', data);
@@ -414,7 +470,8 @@ module.exports = function setupRouter (router, settings) {
         current: page,
         max: Math.ceil(count / 10)
       },
-      csrf: ctx.csrf
+      csrf: ctx.csrf,
+      service: settings.site.service
     };
   
     await ctx.render('page-recent', data);
@@ -452,7 +509,8 @@ module.exports = function setupRouter (router, settings) {
         current: page,
         max: Math.ceil(count / 10)
       },
-      csrf: ctx.csrf
+      csrf: ctx.csrf,
+      service: settings.site.service
     };
   
     await ctx.render('page-recent', data);
@@ -491,7 +549,8 @@ module.exports = function setupRouter (router, settings) {
         current: page,
         max: Math.ceil(count / 10)
       },
-      csrf: ctx.csrf
+      csrf: ctx.csrf,
+      service: settings.site.service
     };
   
     await ctx.render('page-recent', data);
@@ -539,7 +598,8 @@ module.exports = function setupRouter (router, settings) {
         current: page,
         max: Math.ceil(count / 10)
       },
-      csrf: ctx.csrf
+      csrf: ctx.csrf,
+      service: settings.site.service
     };
   
     await ctx.render('page-recent', data);
@@ -575,7 +635,8 @@ module.exports = function setupRouter (router, settings) {
         current: page,
         max: Math.ceil(count / 10)
       },
-      csrf: ctx.csrf
+      csrf: ctx.csrf,
+      service: settings.site.service
     };
   
     await ctx.render('page-recent', data);
@@ -621,7 +682,8 @@ module.exports = function setupRouter (router, settings) {
         current: page,
         max: Math.ceil(count / 10)
       },
-      csrf: ctx.csrf
+      csrf: ctx.csrf,
+      service: settings.site.service
     };
   
     await ctx.render('page-recent', data);
@@ -653,7 +715,8 @@ module.exports = function setupRouter (router, settings) {
         current: page,
         max: Math.ceil(count / 10)
       },
-      csrf: ctx.csrf
+      csrf: ctx.csrf,
+      service: settings.site.service
     };
   
     await ctx.render('page-recent', data);
@@ -695,7 +758,8 @@ module.exports = function setupRouter (router, settings) {
         current: page,
         max: Math.ceil(count / 10)
       },
-      csrf: ctx.csrf
+      csrf: ctx.csrf,
+      service: settings.site.service
     };
   
     await ctx.render('page-recent', data);
@@ -717,8 +781,6 @@ module.exports = function setupRouter (router, settings) {
     const books = await findUserBookmarks(user.id, user.id, 10, 10 * (page - 1));
     const count = await countUserBookmarks(user.id);
 
-    console.log(books[0].toJson());
-
     // extract shot data from bookmark data
     const shots = [];
     for (let i = 0; i < books.length; i++) {
@@ -737,7 +799,8 @@ module.exports = function setupRouter (router, settings) {
         current: page,
         max: Math.ceil(count / 10)
       },
-      csrf: ctx.csrf
+      csrf: ctx.csrf,
+      service: settings.site.service
     };
   
     await ctx.render('page-recent', data);
@@ -785,7 +848,8 @@ module.exports = function setupRouter (router, settings) {
         current: page,
         max: Math.ceil(count / 10)
       },
-      csrf: ctx.csrf
+      csrf: ctx.csrf,
+      service: settings.site.service
     };
   
     await ctx.render('page-recent', data);
@@ -825,7 +889,8 @@ module.exports = function setupRouter (router, settings) {
         current: page,
         max: Math.ceil(count / 10)
       },
-      csrf: ctx.csrf
+      csrf: ctx.csrf,
+      service: settings.site.service
     };
   
     await ctx.render('page-recent', data);
@@ -873,7 +938,8 @@ module.exports = function setupRouter (router, settings) {
         current: page,
         max: Math.ceil(count / 10)
       },
-      csrf: ctx.csrf
+      csrf: ctx.csrf,
+      service: settings.site.service
     };
   
     await ctx.render('page-recent', data);
@@ -933,36 +999,8 @@ module.exports = function setupRouter (router, settings) {
       return;
     }
 
-    // romanize hanzi into phonetic notation
-    const searchArray = pinyin(search, {
-      style: pinyin.STYLE_TONE2,
-      segment: true
-    });
-
-    // flatten array, trim whitespace, split non-han words, convert kana into romaji
-    const searchWords = [];
-    searchArray.forEach(a => {
-      if (a.length < 1) {
-        return;
-      }
-
-      let words = a[0].trim().split(' ');
-      words.forEach(s => {
-        if (s.length < 1) {
-          return;
-        }
-
-        if (!hepburn.containsKana(s)) {
-          searchWords.push(s.toLowerCase());
-          return;
-        }
-
-        searchWords.push(hepburn.fromKana(s).toLowerCase());
-      });
-    });
-
-    // join into a search string
-    const text = searchWords.join(' ');
+    // romanize search string
+    const text = romanize(search);
 
     await db.ready();
     const page = 1;
@@ -1046,7 +1084,8 @@ module.exports = function setupRouter (router, settings) {
         current: page
       },
       search: search,
-      csrf: ctx.csrf
+      csrf: ctx.csrf,
+      service: settings.site.service
     };
   
     await ctx.render('page-search', data);
@@ -1089,7 +1128,7 @@ module.exports = function setupRouter (router, settings) {
         await createBookmark(user, shot);
       }
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
 
     ctx.redirect('back');
@@ -1129,7 +1168,7 @@ module.exports = function setupRouter (router, settings) {
         await createFlag(user, shot);
       }
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
 
     ctx.redirect('back');
@@ -1167,7 +1206,7 @@ module.exports = function setupRouter (router, settings) {
       await deleteBookmarkByShot(shot);
       await shot.delete();
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
 
     ctx.redirect('back');
@@ -1188,8 +1227,72 @@ module.exports = function setupRouter (router, settings) {
     const shot = ctx.request.files.shot;
     const text = ctx.request.body.text;
 
-    console.log(shot);
-    console.log(text);
+    // both image and text must be available, text must have reasonable length
+    if (!shot || !text || text.length > 255) {
+      ctx.redirect('back');
+      return;
+    }
+
+    // create image hash
+    const hash = cuid();
+    const folder = hash.substring(hash.length - 2);
+
+    // catch potential image processing error
+    try {
+      await createDirectory(__dirname + '/public/uploads/' + folder);
+
+      const data = await sharp(shot.path).metadata();
+
+      // size check
+      if (data.width < 1280 || data.width > 5120 || data.height < 720 || data.height > 2880) {
+        console.error("image size: " + data.width + "x" + data.height + " out of range");
+        ctx.redirect('back');
+      }
+
+      await sharp(shot.path).limitInputPixels(5120 * 2880).resize(1280, 720, {
+        fit: 'outside'
+      }).jpeg({
+        quality: 95
+      }).toFile('./public/uploads/' + folder + '/' + hash + '.720p.jpg');
+
+      await sharp(shot.path).limitInputPixels(5120 * 2880).resize(1920, 1080, {
+        fit: 'outside'
+      }).jpeg({
+        quality: 95
+      }).toFile('./public/uploads/' + folder + '/' + hash + '.1080p.jpg');
+
+      await sharp(shot.path).limitInputPixels(5120 * 2880).resize(2560, 1440, {
+        fit: 'outside'
+      }).jpeg({
+        quality: 95
+      }).toFile('./public/uploads/' + folder + '/' + hash + '.1440p.jpg');
+
+      await sharp(shot.path).limitInputPixels(5120 * 2880).resize(3840, 2160, {
+        fit: 'outside'
+      }).jpeg({
+        quality: 95
+      }).toFile('./public/uploads/' + folder + '/' + hash + '.2160p.jpg');
+    } catch (err) {
+      console.error(err);
+    }
+
+    // now create the entry
+    try {
+      let shot = {
+        hash: hash,
+        text: text,
+        romanized: romanize(text),
+        user_id: user.id,
+        bookmark_count: 0,
+        flag_count: 0,
+        created: new Date(),
+        updated: new Date()
+      }
+
+      shot = await createShot(shot);
+    } catch (err) {
+      console.error(err);
+    }
 
     ctx.redirect('back');
   });
@@ -1200,14 +1303,14 @@ module.exports = function setupRouter (router, settings) {
   router.get(settings.oauth.server.callback, async (ctx) => {
     // no session data
     if (!ctx.session || !ctx.session.grant) {
-      ctx.redirect('/');
+      ctx.redirect('/login');
       return;
     }
 
     // missing token, no response or unsupported provider
     const oauthResult = ctx.session.grant;
     if (!settings.oauth[oauthResult.provider] || !oauthResult.response || !oauthResult.response.access_token) {
-      ctx.redirect('/');
+      ctx.redirect('/login');
       return;
     }
 
@@ -1224,10 +1327,13 @@ module.exports = function setupRouter (router, settings) {
       fetchProfile = await twitterAPI.get('account/verify_credentials').auth(oauthResult.response.access_token, oauthResult.response.access_secret).options(requestOptions).request();
     }
 
+    if (!fetchProfile) {
+      ctx.redirect('/login');
+      return;
+    }
+
     // [0] is full response, [1] is response body
-    const userProfile = await fetchProfile.then((result) => {
-      return result[1];
-    });
+    const userProfile = fetchProfile[1];
 
     // find or create it in database
     await db.ready();
@@ -1238,7 +1344,7 @@ module.exports = function setupRouter (router, settings) {
         localUser = await createUser(oauthResult, userProfile);
       }
     } catch (err) {
-      console.err(err);
+      console.error(err);
     }
 
     // update session cookie
