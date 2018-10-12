@@ -11,6 +11,7 @@ const hepburn = require('hepburn');
 const sharp = require('sharp');
 const cuid = require('cuid');
 const createDirectory = require('make-dir');
+const delFiles = require('del');
 
 // define models
 
@@ -177,6 +178,13 @@ async function findUserFlags (user_id, login_id, limit = 0, offset = 0) {
 async function searchShots (text, id, limit = 0, offset = 0) {
   const shotModel = db.Model('shots');
   const shots = await shotModel.where({ romanized_like: text }).order('created', true).limit(limit, offset).include(['user', 'bookmark', 'flag']).where({ bookmark: { user_id: id }, flag: { user_id: id } });
+
+  return shots;
+}
+
+async function duplicateShots (text, id, limit = 0, offset = 0) {
+  const shotModel = db.Model('shots');
+  const shots = await shotModel.where({ romanized: text, created_gt: new Date() - 86400 * 7 * 1000 }).order('created', true).limit(limit, offset).include(['user', 'bookmark', 'flag']).where({ bookmark: { user_id: id }, flag: { user_id: id } });
 
   return shots;
 }
@@ -985,7 +993,7 @@ module.exports = function setupRouter (router, settings) {
       return;
     }
 
-    ctx.redirect('/search/' + query);
+    ctx.redirect('/search/' + encodeURIComponent(query));
   });
 
   //
@@ -1018,7 +1026,8 @@ module.exports = function setupRouter (router, settings) {
         current: page
       },
       search: search,
-      csrf: ctx.csrf
+      csrf: ctx.csrf,
+      service: settings.site.service
     };
   
     await ctx.render('page-search', data);
@@ -1037,7 +1046,7 @@ module.exports = function setupRouter (router, settings) {
 
     const page = parseInt(ctx.request.params.page);
     if (isNaN(page) || page < 2 || page != ctx.request.params.page) {
-      ctx.redirect('/search/' + search);
+      ctx.redirect('/search/' + encodeURIComponent(search));
       return;
     }
 
@@ -1089,6 +1098,42 @@ module.exports = function setupRouter (router, settings) {
     };
   
     await ctx.render('page-search', data);
+  });
+
+  //
+  // duplicate page
+  //
+  router.get('/duplicate/:keyword', async (ctx) => {
+    const search = ctx.request.params.keyword;
+
+    if (!search) {
+      ctx.redirect('/');
+      return;
+    }
+
+    // romanize search string
+    const text = romanize(search);
+    console.log(text);
+
+    await db.ready();
+    const user = await findCurrentUser(ctx);
+    const id = user ? user.id : -1;
+    const shots = await duplicateShots(text, id, 4, 0);
+
+    const data = {
+      meta: settings.site.meta,
+      i18n: settings.site.i18n[settings.site.meta.lang],
+      user: user ? user.toJson() : null,
+      shots: shots ? shots.toJson() : [],
+      paging: {
+        name: '/duplicate/' + search
+      },
+      search: search,
+      csrf: ctx.csrf,
+      service: settings.site.service
+    };
+  
+    await ctx.render('page-index', data);
   });
 
   //
@@ -1186,12 +1231,6 @@ module.exports = function setupRouter (router, settings) {
       return;
     }
 
-    // must be a moderator to perform this
-    if (!user.is_mod) {
-      ctx.redirect('/');
-      return;
-    }
-
     const id = ctx.request.body.shot;
     const shot = await findShot(id);
 
@@ -1200,10 +1239,28 @@ module.exports = function setupRouter (router, settings) {
       return;
     }
 
+    // must be a moderator or image owner to perform this
+    if (!user.is_mod && shot.user_id != user.id) {
+      ctx.redirect('/');
+      return;
+    }
+
     // catch potential write error
     try {
+      // delete related bookmarks and flags
       await deleteFlagByShot(shot);
       await deleteBookmarkByShot(shot);
+
+      // delete files
+      const folder = shot.hash.substring(shot.hash.length - 2);
+      await delFiles([
+        './public/uploads/' + folder + "/" + shot.hash + ".720p.jpg",
+        './public/uploads/' + folder + "/" + shot.hash + ".1080p.jpg",
+        './public/uploads/' + folder + "/" + shot.hash + ".1440p.jpg",
+        './public/uploads/' + folder + "/" + shot.hash + ".2160p.jpg"
+      ]);
+
+      // delete actual shot
       await shot.delete();
     } catch (err) {
       console.error(err);
@@ -1230,6 +1287,15 @@ module.exports = function setupRouter (router, settings) {
     // both image and text must be available, text must have reasonable length
     if (!shot || !text || text.length > 255) {
       ctx.redirect('back');
+      return;
+    }
+
+    // check for duplicate text
+    const search = romanize(text);
+    const shots = await duplicateShots(search, user.id, 4, 0);
+
+    if (shots.length > 1) {
+      ctx.redirect('/duplicate/' + encodeURIComponent(text));
       return;
     }
 

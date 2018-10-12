@@ -51,7 +51,7 @@ div.column.col-10.col-md-9.col-sm-8.col-xs-12
                 target="_blank"
                 data-tooltip=i18n.source_tooltip
               ) #{i18n.source_icon} #{i18n.source}
-              if user && user.is_mod
+              if user && (user.is_mod || shot.user_id == user.id)
                 button.btn.btn-sm.btn-secondary.m-1.tooltip(
                   type="submit"
                   name="shot"
