@@ -6,7 +6,7 @@ const openrecord = require('openrecord/store/sqlite3');
 const pinyin = require('pinyin');
 const hepburn = require('hepburn');
 
-const settings = require('./animeshot.json');
+const settings = require(__dirname + '/animeshot.json');
 
 // create bot
 
@@ -15,7 +15,7 @@ const bot = new telegraf(settings.bot.telegram);
 // define db models
 
 const db = new openrecord({
-  file: './database/animeshot.sqlite',
+  file: __dirname + '/database/animeshot.sqlite',
   autoLoad: true,
   autoConnect: true,
   autoAttributes: true
