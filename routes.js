@@ -1428,6 +1428,8 @@ module.exports = function setupRouter (router, settings) {
       }
     } catch (err) {
       console.error(err);
+      ctx.redirect('/');
+      return;
     }
 
     // update session cookie
