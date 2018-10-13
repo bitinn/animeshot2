@@ -34,8 +34,7 @@ db.Model('shots', function () {
 function romanize (text) {
   // romanize hanzi into phonetic notation
   const textArray = pinyin(text, {
-    style: pinyin.STYLE_TONE2,
-    segment: true
+    style: pinyin.STYLE_TONE2
   });
 
   // flatten array
