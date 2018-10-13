@@ -20,7 +20,7 @@ const koaSSL = require('koa-sslify');
 const grant = require('grant-koa');
 
 const setupRouter = require('./routes');
-const settings = require('./animeshot.json');
+const settings = require(__dirname + '/animeshot.json');
 
 // define routing
 

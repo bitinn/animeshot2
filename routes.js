@@ -16,7 +16,7 @@ const delFiles = require('del');
 // define models
 
 const db = new openrecord({
-  file: './database/animeshot.sqlite',
+  file: __dirname + '/database/animeshot.sqlite',
   autoLoad: true,
   autoConnect: true,
   autoAttributes: true
@@ -1293,10 +1293,10 @@ module.exports = function setupRouter (router, settings) {
       // delete files
       const folder = shot.hash.substring(shot.hash.length - 2);
       await delFiles([
-        './public/uploads/' + folder + "/" + shot.hash + ".720p.jpg",
-        './public/uploads/' + folder + "/" + shot.hash + ".1080p.jpg",
-        './public/uploads/' + folder + "/" + shot.hash + ".1440p.jpg",
-        './public/uploads/' + folder + "/" + shot.hash + ".2160p.jpg"
+        __dirname + '/public/uploads/' + folder + "/" + shot.hash + ".720p.jpg",
+        __dirname + '/public/uploads/' + folder + "/" + shot.hash + ".1080p.jpg",
+        __dirname + '/public/uploads/' + folder + "/" + shot.hash + ".1440p.jpg",
+        __dirname + '/public/uploads/' + folder + "/" + shot.hash + ".2160p.jpg"
       ]);
 
       // delete actual shot
@@ -1343,10 +1343,11 @@ module.exports = function setupRouter (router, settings) {
     const folder = hash.substring(hash.length - 2);
 
     // catch potential image processing error
+    let data;
     try {
       await createDirectory(__dirname + '/public/uploads/' + folder);
 
-      const data = await sharp(shot.path).metadata();
+      data = await sharp(shot.path).metadata();
 
       // size check
       if (data.width < 1280 || data.width > 5120 || data.height < 720 || data.height > 2880) {
@@ -1358,33 +1359,29 @@ module.exports = function setupRouter (router, settings) {
         fit: 'outside'
       }).jpeg({
         quality: 95
-      }).toFile('./public/uploads/' + folder + '/' + hash + '.720p.jpg');
+      }).toFile(__dirname + '/public/uploads/' + folder + '/' + hash + '.720p.jpg');
 
-      if (data.width >= 1920 && data.height >= 1080) {
-        await sharp(shot.path).limitInputPixels(5120 * 2880).resize(1920, 1080, {
-          fit: 'outside'
-        }).jpeg({
-          quality: 95
-        }).toFile('./public/uploads/' + folder + '/' + hash + '.1080p.jpg');
-      }
+      await sharp(shot.path).limitInputPixels(5120 * 2880).resize(1920, 1080, {
+        fit: 'outside'
+      }).jpeg({
+        quality: 95
+      }).toFile(__dirname + '/public/uploads/' + folder + '/' + hash + '.1080p.jpg');
 
-      if (data.width >= 2560 && data.height >= 1440) {
-        await sharp(shot.path).limitInputPixels(5120 * 2880).resize(2560, 1440, {
-          fit: 'outside'
-        }).jpeg({
-          quality: 95
-        }).toFile('./public/uploads/' + folder + '/' + hash + '.1440p.jpg');
-      }
+      await sharp(shot.path).limitInputPixels(5120 * 2880).resize(2560, 1440, {
+        fit: 'outside'
+      }).jpeg({
+        quality: 95
+      }).toFile(__dirname + '/public/uploads/' + folder + '/' + hash + '.1440p.jpg');
 
-      if (data.width >= 3840 && data.height >= 2160) {
-        await sharp(shot.path).limitInputPixels(5120 * 2880).resize(3840, 2160, {
-          fit: 'outside'
-        }).jpeg({
-          quality: 95
-        }).toFile('./public/uploads/' + folder + '/' + hash + '.2160p.jpg');
-      }
+      await sharp(shot.path).limitInputPixels(5120 * 2880).resize(3840, 2160, {
+        fit: 'outside'
+      }).jpeg({
+        quality: 95
+      }).toFile(__dirname + '/public/uploads/' + folder + '/' + hash + '.2160p.jpg');
     } catch (err) {
       console.error(err);
+      ctx.redirect('back');
+      return;
     }
 
     // now create the entry
