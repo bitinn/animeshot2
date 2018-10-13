@@ -97,11 +97,11 @@ bot.on('inline_query', async ({ inlineQuery, answerInlineQuery }) => {
     return {
       type: 'photo',
       id: shot.hash,
-      photo_url: meta.base_url + "/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".1080p.jpg",
-      thumb_url: meta.base_url + "/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".720p.jpg",
+      photo_url: settings.site.meta.base_url + "/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".1080p.jpg",
+      thumb_url: settings.site.meta.base_url + "/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".720p.jpg",
       photo_width: shot.image_width,
       photo_height: shot.image_height,
-      caption: shot.text + "\r\n[" + meta.base_url + "/shot/" + shot.hash + "](source)",
+      caption: shot.text + "\r\n[" + settings.site.meta.base_url + "/shot/" + shot.hash + "](source)",
       parse_mode: 'Markdown'
     }
   });
