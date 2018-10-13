@@ -2,10 +2,11 @@
   "site": {
     "meta": {
       "title": "AnimeShot",
-      "owner": "...",
-      "tagline": "...",
+      "owner": "your twitter handle",
+      "tagline": "your site description",
       "logo": "/images/animeshot.jpg",
-      "lang": "en"
+      "lang": "en",
+      "base_url": "https://your.site.domain"
     },
     "i18n": {
       "en": {
@@ -19,15 +20,24 @@
         "logout": "Logout",
         "bookmark": "Add to Bookmarks",
         "flag": "Flag this Shot",
+        "link": "链接",
+        "link_tooltip": "Image page and links",
         "source": "Source",
         "source_tooltip": "View source of image",
         "delete": "Delete",
         "delete_tooltip": "Delete image permanently (cannot undo)",
+        "share": "Share",
+        "share_tooltip": "Share to Twitter",
+        "upload": "Upload",
+        "upload_label": "Upload screenshot",
+        "text_label": "Subtitle text",
         "shot_icon": "📷",
         "bookmark_icon": "🔖",
         "flag_icon": "⛳",
         "source_icon": "🔎",
         "delete_icon": "❌",
+        "link_icon": "🔗",
+        "share_icon": "#️⃣",
         "keyword": "Keyword",
         "search": "Search",
         "previous": "Prev",
@@ -37,7 +47,11 @@
         "no_bookmarks": "You don't have any bookmarks yet.",
         "no_flags": "You don't have any flags yet.",
         "login_with_twitter": "Login with Twitter",
-        "login_with_github": "Login with GitHub"
+        "login_with_github": "Login with GitHub",
+        "login_note": "Upload your favorite anime screenshot after login",
+        "click_to_copy": "Click to copy links",
+        "please_read": "Please read our rules before upload -",
+        "guide_content": "Acceptable Content"
       },
       "zh": {
         "recent": "近期上传",
@@ -50,15 +64,24 @@
         "logout": "登出账户",
         "bookmark": "加入收藏",
         "flag": "插旗待审",
+        "link": "链接",
+        "link_tooltip": "页面与图片链接",
         "source": "出处",
         "source_tooltip": "查找图片出处",
         "delete": "删除",
         "delete_tooltip": "永久删除图片（不可逆）",
+        "share": "分享",
+        "share_tooltip": "分享到推特",
+        "upload": "上传",
+        "upload_label": "选择图片",
+        "text_label": "字幕内容",
         "shot_icon": "📷",
         "bookmark_icon": "🔖",
         "flag_icon": "⛳",
         "source_icon": "🔎",
         "delete_icon": "❌",
+        "link_icon": "🔗",
+        "share_icon": "#️⃣",
         "keyword": "关键词",
         "search": "搜索",
         "previous": "上一页",
@@ -68,14 +91,28 @@
         "no_bookmarks": "你还没有收藏内容",
         "no_flags": "你还没有插旗内容",
         "login_with_twitter": "使用 Twitter 登陆",
-        "login_with_github": "使用 GitHub 登陆"
+        "login_with_github": "使用 GitHub 登陆",
+        "login_note": "登录后即可上传你喜爱的吐槽截图",
+        "click_to_copy": "点击复制链接",
+        "please_read": "上传前请阅读本站规则 -",
+        "guide_content": "允许内容"
       }
     },
-    "dev": true,
-    "port": 3000
+    "service": {
+      "source": "https://whatanime.ga/?url=",
+      "twitter": "https://twitter.com/intent/tweet?url="
+    },
+    "server": {
+      "ssl_certificate": "/ssl/localhost.crt",
+      "ssl_key": "/ssl/localhost.key",
+      "http_port": 80,
+      "https_port": 443,
+      "server_port": 3000,
+      "has_proxy": true
+    }
   },
   "cookie": {
-    "keys": ["test secret"],
+    "keys": ["keep this secret"],
     "session": {
       "signed": true,
       "maxAge": 86400000,
@@ -84,19 +121,22 @@
   },
   "oauth": {
     "server": {
-      "protocol": "http",
-      "host": "localhost:3000",
+      "protocol": "https",
+      "host": "your.site.domain",
       "callback": "/oauth/callback",
       "transport": "session",
       "state": true
     },
     "twitter": {
-      "key": "...",
-      "secret": "..."
+      "key": "...apply for a twitter app...",
+      "secret": "...apply for a twitter app..."
     },
     "github": {
-      "key": "...",
-      "secret": "..."
+      "key": "...apply for a github app...",
+      "secret": "...apply for a github app..."
     }
+  },
+  "bot": {
+    "telegram": "...apply for a telegram bot..."
   }
 }
