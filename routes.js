@@ -66,8 +66,7 @@ util.inspect.defaultOptions.customInspect = false;
 function romanize (text) {
   // romanize hanzi into phonetic notation
   const textArray = pinyin(text, {
-    style: pinyin.STYLE_TONE2,
-    segment: true
+    style: pinyin.STYLE_TONE2
   });
 
   // flatten array
@@ -1089,33 +1088,7 @@ module.exports = function setupRouter (router, settings) {
       return;
     }
 
-    const searchArray = pinyin(search, {
-      style: pinyin.STYLE_TONE2,
-      segment: true
-    });
-
-    const searchWords = [];
-    searchArray.forEach(a => {
-      if (a.length < 1) {
-        return;
-      }
-
-      let words = a[0].trim().split(' ');
-      words.forEach(s => {
-        if (s.length < 1) {
-          return;
-        }
-
-        if (!hepburn.containsKana(s)) {
-          searchWords.push(s.toLowerCase());
-          return;
-        }
-
-        searchWords.push(hepburn.fromKana(s).toLowerCase());
-      });
-    });
-
-    const text = searchWords.join(' ');
+    const text = romanize(search);
 
     await db.ready();
     const user = await findCurrentUser(ctx);
