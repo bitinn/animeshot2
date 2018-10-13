@@ -95,14 +95,22 @@ bot.on('inline_query', async ({ inlineQuery, answerInlineQuery }) => {
   const shotArray = shots.toJson();
   const results = shotArray.map((shot) => {
     return {
-      type: 'photo',
+      type: 'article',
       id: shot.hash,
+      title: shot.text,
+      url: settings.site.meta.base_url + "/shot/" + shot.hash,
+      hide_url: true,
+      thumb_url: settings.site.meta.base_url + "/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".1080p.jpg",
+      thumb_width: 1920,
+      thumb_height: 1080,
+      /*
       photo_url: settings.site.meta.base_url + "/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".1080p.jpg",
       thumb_url: settings.site.meta.base_url + "/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".720p.jpg",
-      photo_width: shot.image_width,
-      photo_height: shot.image_height,
+      photo_width: 1920,
+      photo_height: 1080,
       caption: shot.text + "\r\n[" + settings.site.meta.base_url + "/shot/" + shot.hash + "](source)",
-      parse_mode: 'Markdown'
+      parse_mode: 'markdown'
+      */
     }
   });
 
