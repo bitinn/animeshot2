@@ -1360,23 +1360,29 @@ module.exports = function setupRouter (router, settings) {
         quality: 95
       }).toFile('./public/uploads/' + folder + '/' + hash + '.720p.jpg');
 
-      await sharp(shot.path).limitInputPixels(5120 * 2880).resize(1920, 1080, {
-        fit: 'outside'
-      }).jpeg({
-        quality: 95
-      }).toFile('./public/uploads/' + folder + '/' + hash + '.1080p.jpg');
+      if (data.width >= 1920 && data.height >= 1080) {
+        await sharp(shot.path).limitInputPixels(5120 * 2880).resize(1920, 1080, {
+          fit: 'outside'
+        }).jpeg({
+          quality: 95
+        }).toFile('./public/uploads/' + folder + '/' + hash + '.1080p.jpg');
+      }
 
-      await sharp(shot.path).limitInputPixels(5120 * 2880).resize(2560, 1440, {
-        fit: 'outside'
-      }).jpeg({
-        quality: 95
-      }).toFile('./public/uploads/' + folder + '/' + hash + '.1440p.jpg');
+      if (data.width >= 2560 && data.height >= 1440) {
+        await sharp(shot.path).limitInputPixels(5120 * 2880).resize(2560, 1440, {
+          fit: 'outside'
+        }).jpeg({
+          quality: 95
+        }).toFile('./public/uploads/' + folder + '/' + hash + '.1440p.jpg');
+      }
 
-      await sharp(shot.path).limitInputPixels(5120 * 2880).resize(3840, 2160, {
-        fit: 'outside'
-      }).jpeg({
-        quality: 95
-      }).toFile('./public/uploads/' + folder + '/' + hash + '.2160p.jpg');
+      if (data.width >= 3840 && data.height >= 2160) {
+        await sharp(shot.path).limitInputPixels(5120 * 2880).resize(3840, 2160, {
+          fit: 'outside'
+        }).jpeg({
+          quality: 95
+        }).toFile('./public/uploads/' + folder + '/' + hash + '.2160p.jpg');
+      }
     } catch (err) {
       console.error(err);
     }
@@ -1390,6 +1396,8 @@ module.exports = function setupRouter (router, settings) {
         user_id: user.id,
         bookmark_count: 0,
         flag_count: 0,
+        image_width: data.width,
+        image_height: data.height,
         created: new Date(),
         updated: new Date()
       }

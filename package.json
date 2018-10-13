@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon --ext js,pug,json index.js",
+    "bot": "node bot.js",
     "db:migrate": "node ./scripts/migrate.js",
     "db:reset": "node ./scripts/reset.js",
     "db:seed": "node ./scripts/seed.js",
@@ -46,7 +47,8 @@
     "purest": "^3.1.0",
     "request": "^2.88.0",
     "sharp": "^0.20.8",
-    "sqlite3": "^4.0.2"
+    "sqlite3": "^4.0.2",
+    "telegraf": "^3.24.1"
   },
   "devDependencies": {
     "nodemon": "^1.18.4"
