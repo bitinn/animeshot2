@@ -32,6 +32,11 @@ setupRouter(router, settings);
 const app = new koa();
 
 app.use(koaLogger());
+
+if (!settings.site.server.has_proxy) {
+  app.use(koaSSL());
+}
+
 app.use(koaStatic(__dirname + '/public', {
   maxage: 1000 * 86400 * 30
 }));
@@ -65,8 +70,6 @@ if (settings.site.server.has_proxy) {
   app.listen(settings.site.server.server_port);
 
 } else {
-  // enable ssl
-  app.use(koaSSL());
   const ssl = {
     key: fs.readFileSync(__dirname + settings.site.server.ssl_key),
     cert: fs.readFileSync(__dirname + settings.site.server.ssl_certificate)
