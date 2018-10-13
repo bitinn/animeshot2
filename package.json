@@ -36,6 +36,7 @@
     "koa-logger": "^3.2.0",
     "koa-mount": "^4.0.0",
     "koa-session": "^5.9.0",
+    "koa-sslify": "^2.1.2",
     "koa-static": "^5.0.0",
     "koa-trie-router": "^2.1.6",
     "koa-views": "^6.1.4",
@@ -48,7 +49,8 @@
     "request": "^2.88.0",
     "sharp": "^0.20.8",
     "sqlite3": "^4.0.2",
-    "telegraf": "^3.24.1"
+    "telegraf": "^3.24.1",
+    "validator": "^10.8.0"
   },
   "devDependencies": {
     "nodemon": "^1.18.4"

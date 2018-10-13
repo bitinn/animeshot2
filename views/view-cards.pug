@@ -18,9 +18,11 @@ div.column.col-10.col-md-9.col-sm-8.col-xs-12
                 div.avatar.avatar-sm.bg-primary(data-initial=shot.user.name.charAt(0).toUpperCase())
                   a(href="/user/" + shot.user.username)
                     if shot.user.twitter_avatar
-                      img(src=shot.user.twitter_avatar alt="avatar")
+                      //- img(src=shot.user.twitter_avatar alt="avatar")
+                      img(src=("/avatar/24?url=" + encodeURIComponent(shot.user.twitter_avatar) + "&hmac=" + shot.user.hmac))
                     else if shot.user.github_avatar
-                      img(src=shot.user.github_avatar alt="avatar")
+                      //- img(src=shot.user.github_avatar alt="avatar")
+                      img(src=("/avatar/24?url=" + encodeURIComponent(shot.user.github_avatar) + "&hmac=" + shot.user.hmac))
                 span
                   a.text-dark(href="/user/" + shot.user.username) #{shot.user.name}
           div.card-footer

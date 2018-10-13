@@ -1,10 +1,6 @@
 
 // app dependency
 
-//const koa = require('koa');
-//const koaBody = require('koa-body');
-//const koaRouter = require('koa-trie-router');
-
 const telegraf = require('telegraf');
 const openrecord = require('openrecord/store/sqlite3');
 const pinyin = require('pinyin');

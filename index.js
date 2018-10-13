@@ -1,6 +1,10 @@
 
 // app dependency
 
+const http = require('http');
+const https = require('https');
+const fs = require('fs');
+
 const koa = require('koa');
 
 const koaViews = require('koa-views');
@@ -11,6 +15,7 @@ const koaSession = require('koa-session');
 const koaMount = require('koa-mount');
 const koaBody = require('koa-body');
 const koaCSRF = require('koa-csrf');
+const koaSSL = require('koa-sslify');
 
 const grant = require('grant-koa');
 
@@ -27,7 +32,9 @@ setupRouter(router, settings);
 const app = new koa();
 
 app.use(koaLogger());
-app.use(koaStatic(__dirname + '/public'));
+app.use(koaStatic(__dirname + '/public', {
+  maxage: 1000 * 86400 * 30
+}));
 app.use(koaViews(__dirname + '/views', {
   extension: 'pug'
 }));
@@ -49,4 +56,20 @@ app.use(koaSession(settings.cookie.session, app));
 app.use(koaMount(grant(settings.oauth)));
 app.use(router.middleware());
 
-app.listen(settings.site.server.port);
+// whether we use a reverse proxy like nginx
+if (settings.site.server.has_proxy) {
+  // start sever, let proxy handle the rest
+  app.listen(settings.site.server.server_port);
+
+} else {
+  // enable ssl
+  app.use(koaSSL());
+  const ssl = {
+    key: fs.readFileSync(__dirname + settings.site.server.ssl_key),
+    cert: fs.readFileSync(__dirname + settings.site.server.ssl_certificate)
+  };
+
+  // start server
+  http.createServer(app.callback()).listen(settings.site.server.http_port);
+  https.createServer(ssl, app.callback()).listen(settings.site.server.https_port);
+}
