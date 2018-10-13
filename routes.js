@@ -133,6 +133,13 @@ async function findShot (id) {
   return shot;
 }
 
+async function findShotByHash (hash, id) {
+  const shotModel = db.Model('shots');
+  const shot = await shotModel.where({ hash: hash }).first().include(['user', 'bookmark', 'flag']).where({ bookmark: { user_id: id }, flag: { user_id: id } });
+
+  return shot;
+}
+
 async function findRecentShots (id, limit = 0, offset = 0) {
   const shotModel = db.Model('shots');
   const shots = await shotModel.order('created', true).limit(limit, offset).include(['user', 'bookmark', 'flag']).where({ bookmark: { user_id: id }, flag: { user_id: id } });
@@ -387,6 +394,37 @@ module.exports = function setupRouter (router, settings) {
     };
   
     await ctx.render('page-index', data);
+  });
+
+  //
+  // shot page
+  //
+  router.get('/shot/:hash', async (ctx) => {
+    const hash = ctx.request.params.hash;
+
+    await db.ready();
+    const user = await findCurrentUser(ctx);
+    const id = user ? user.id : -1;
+    const shot = await findShotByHash(hash, id);
+
+    if (!shot) {
+      ctx.redirect('/');
+      return;
+    }
+
+    const data = {
+      meta: settings.site.meta,
+      i18n: settings.site.i18n[settings.site.meta.lang],
+      user: user ? user.toJson() : null,
+      shot: shot.toJson(),
+      paging: {
+        name: '/shot/' + hash,
+      },
+      csrf: ctx.csrf,
+      service: settings.site.service
+    };
+  
+    await ctx.render('page-shot', data);
   });
 
   //
@@ -968,7 +1006,8 @@ module.exports = function setupRouter (router, settings) {
   
     const data = {
       meta: settings.site.meta,
-      i18n: settings.site.i18n[settings.site.meta.lang]
+      i18n: settings.site.i18n[settings.site.meta.lang],
+      csrf: ctx.csrf
     };
   
     await ctx.render('page-login', data);
