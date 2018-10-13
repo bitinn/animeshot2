@@ -1,0 +1,23 @@
+.btn-secondary, .btn-secondary:visited {
+  border-color: #50596c;
+  color: #50596c;
+}
+
+.btn-secondary:hover, .btn-secondary:focus {
+  background-color: #f8f9fa;
+  border-color: #50596c;
+  color: #50596c;
+}
+
+.btn-secondary:focus {
+  box-shadow: 0 0 0 0.1rem #f8f9fa;
+}
+
+.btn-secondary:active, .btn-secondary.active {
+  background-color: #50596c;
+  color: #fff;
+}
+
+.upload-region {
+  background-color: #f8f9fa;
+}

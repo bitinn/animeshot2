@@ -1,0 +1,56 @@
+div.column.col-2.col-md-3.col-sm-4.col-xs-12
+div.column.column.col-10.col-md-9.col-sm-8.col-xs-12.text-center
+  div.d-inline-block.text-left
+    ul.pagination
+      //- previous page and first page
+      if paging.current == 1
+        li.page-item.disabled
+          span #{i18n.previous}
+        li.page-item.active
+          a(href=paging.name + "/1") 1
+      else
+        li.page-item
+          a(href=paging.name + "/" + (paging.current - 1)) #{i18n.previous}
+        li.page-item
+          a(href=paging.name + "/1") 1
+      //- special cases
+      if paging.max >= 3 && paging.max <= 5
+        li.page-item(class=(paging.current == 2) ? "active" : "")
+          a(href=paging.name + "/2") 2
+      if paging.max >= 4 && paging.max <= 5
+        li.page-item(class=(paging.current == 3) ? "active" : "")
+          a(href=paging.name + "/3") 3
+      if paging.max == 5
+        li.page-item(class=(paging.current == 4) ? "active" : "")
+          a(href=paging.name + "/4") 4
+      //- common cases
+      if paging.max >= 6
+        if paging.current >= 4
+          li.page-item
+            span ...
+        if paging.current >= 3 && paging.current <= paging.max
+          li.page-item
+            a(href=paging.name + "/" + (paging.current - 1)) #{paging.current - 1}
+        if paging.current >= 2 && paging.current <= paging.max - 1
+          li.page-item.active
+            a(href=paging.name + "/" + paging.current) #{paging.current}
+        if paging.current >= 1 && paging.current <= paging.max - 2
+          li.page-item
+            a(href=paging.name + "/" + (paging.current + 1)) #{paging.current + 1}
+        if paging.current <= paging.max - 3
+          li.page-item
+            span ...
+      //- last page and next page
+      if paging.max <= 1
+        li.page-item.disabled
+          span #{i18n.next}
+      else if paging.current == paging.max
+        li.page-item.active
+          a(href=paging.name + "/" + paging.max) #{paging.max}
+        li.page-item.disabled
+          span #{i18n.next}
+      else
+        li.page-item
+            a(href=paging.name + "/" + paging.max) #{paging.max}
+        li.page-item
+          a(href=paging.name + "/" + (paging.current + 1)) #{i18n.next}

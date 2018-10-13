@@ -1,0 +1,16 @@
+div.columns
+  div.column.col-12.p-2.mb-2.upload-region
+    if user
+      p.h5 #{i18n.please_read}
+        | 
+        a(href="/guide/content") #{i18n.guide_content}
+      form(method="post" enctype="multipart/form-data")
+        div.form-group
+          input(type="hidden", name='_csrf', value=csrf)
+          label.form-label(for="shot") #{i18n.upload_label}
+          input.form-input(type="file" name="shot")
+          label.form-label(for="text") #{i18n.text_label}
+          input.form-input(type="text" name="text" placeholder="")
+          button.btn.btn-success.mt-2(type="submit" formaction="/action/upload") #{i18n.shot_icon} #{i18n.upload}
+    else
+      p.h5.m-2.text-center #{i18n.login_note}

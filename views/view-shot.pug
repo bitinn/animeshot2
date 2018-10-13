@@ -1,0 +1,74 @@
+div.column.col-10.col-md-9.col-sm-8.col-xs-12
+  div.card
+    div.card-image
+      img.img-responsive(
+        src=("/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".720p.jpg")
+        alt=shot.text
+      )
+    div.card-body
+      if shot.text
+        p.h4 #{shot.text}
+      if shot.user && shot.user.username
+        div.chip
+          div.avatar.avatar-sm.bg-primary(data-initial=shot.user.name.charAt(0).toUpperCase())
+            a(href="/user/" + shot.user.username)
+              if shot.user.twitter_avatar
+                img(src=shot.user.twitter_avatar alt="avatar")
+              else if shot.user.github_avatar
+                img(src=shot.user.github_avatar alt="avatar")
+          span
+            a.text-dark(href="/user/" + shot.user.username) #{shot.user.name}
+    div.card-footer
+      form(method="post" enctype="multipart/form-data")
+        input(type="hidden", name='_csrf', value=csrf)
+        button.btn.btn-sm.m-1.tooltip(
+          class=(shot.bookmark && shot.bookmark.length > 0) ? "active" : ""
+          type="submit"
+          name="bookmark"
+          formaction="/action/bookmark"
+          value=shot.id
+          data-tooltip=i18n.bookmark
+        ) #{i18n.bookmark_icon} #{shot.bookmark_count}
+        button.btn.btn-sm.btn-secondary.m-1.tooltip(
+          class=(shot.flag && shot.flag.length > 0) ? "active" : ""
+          type="submit"
+          name="flag"
+          formaction="/action/flag"
+          value=shot.id
+          data-tooltip=i18n.flag
+        ) #{i18n.flag_icon} #{shot.flag_count}
+        a.btn.btn-sm.btn-secondary.m-1.tooltip(
+          href=("/shot/" + shot.hash)
+          data-tooltip=i18n.link_tooltip
+        ) #{i18n.link_icon} #{i18n.link}
+        a.btn.btn-sm.btn-secondary.m-1.tooltip(
+          href=(service.source + meta.base_url + "/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".720p.jpg")
+          target="_blank"
+          data-tooltip=i18n.source_tooltip
+        ) #{i18n.source_icon} #{i18n.source}
+        a.btn.btn-sm.btn-secondary.m-1.tooltip(
+          href=(service.twitter + meta.base_url + "/shot/" + shot.hash + "&text=" + shot.text)
+          target="_blank"
+          data-tooltip=i18n.share_tooltip
+        ) #{i18n.share_icon} #{i18n.share}
+        if user && (user.is_mod || shot.user_id == user.id)
+          button.btn.btn-sm.btn-secondary.m-1.tooltip(
+            type="submit"
+            name="shot"
+            formaction="/action/shot"
+            value=shot.id
+            data-tooltip=i18n.delete_tooltip
+          ) #{i18n.delete_icon} #{i18n.delete}
+    div.card-footer
+      div.divider
+      p.h5 #{i18n.click_to_copy}
+      div.form-group
+        label.form-label(for="p720") 720p (1280x720)
+        input.form-input(type="text" name="p720" placeholder="" readonly value=(meta.base_url + "/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".720p.jpg") onclick='copyInput(this)')
+        label.form-label(for="p1080") 1080p (1920x1080)
+        input.form-input(type="text" name="p1080" placeholder="" readonly value=(meta.base_url + "/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".1080p.jpg") onclick='copyInput(this)')
+        label.form-label(for="p1440") 1440p (2560x1440)
+        input.form-input(type="text" name="p1440" placeholder="" readonly value=(meta.base_url + "/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".1440p.jpg") onclick='copyInput(this)')
+        label.form-label(for="p2160") 2160p (3840x2160)
+        input.form-input(type="text" name="p2160" placeholder="" readonly value=(meta.base_url + "/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".2160p.jpg") onclick='copyInput(this)')
+

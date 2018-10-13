@@ -1,0 +1,16 @@
+div.columns.p-2.mt-2
+  div.column.col-6.col-sm-12
+    h1.h3
+      a(href="/") #{meta.title}
+    p #{meta.tagline}
+  div.column.col-6.col-sm-12
+    form(action="/search" method="get")
+      div.input-group
+        label.input-group-addon #{i18n.keyword}
+        if search
+          input.form-input(type="search" name="q" placeholder="" value=search)
+        else
+          input.form-input(type="search" name="q" placeholder="")
+        button.btn.btn-primary.input-group-btn(type="submit") #{i18n.search}
+  div.column.col-12
+    div.divider

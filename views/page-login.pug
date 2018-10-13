@@ -1,0 +1,11 @@
+doctype html
+html(lang=en)
+  include meta-site.pug
+  body
+    div.container.grid-lg(lang=meta.lang)
+      include view-header.pug
+      div.columns.p-2
+        div.column.col-12.text-center
+          a.btn.btn-lg.btn-secondary.m-1(href="/connect/twitter") #{i18n.login_with_twitter}
+          a.btn.btn-lg.btn-secondary.m-1(href="/connect/github") #{i18n.login_with_github}
+      include view-footer.pug

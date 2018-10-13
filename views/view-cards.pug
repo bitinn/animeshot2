@@ -1,0 +1,72 @@
+div.column.col-10.col-md-9.col-sm-8.col-xs-12
+  if paging.name == "/index"
+    include view-upload.pug
+  div.columns
+    each shot in shots
+      div.column.col-6.col-sm-12.mt-2
+        div.card
+          div.card-image
+            img.img-responsive(
+              src=("/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".720p.jpg")
+              alt=shot.text
+            )
+          div.card-body
+            if shot.text
+              p #{shot.text}
+            if shot.user && shot.user.username
+              div.chip
+                div.avatar.avatar-sm.bg-primary(data-initial=shot.user.name.charAt(0).toUpperCase())
+                  a(href="/user/" + shot.user.username)
+                    if shot.user.twitter_avatar
+                      //- img(src=shot.user.twitter_avatar alt="avatar")
+                      img(src=("/avatar/24?url=" + encodeURIComponent(shot.user.twitter_avatar) + "&hmac=" + shot.user.hmac))
+                    else if shot.user.github_avatar
+                      //- img(src=shot.user.github_avatar alt="avatar")
+                      img(src=("/avatar/24?url=" + encodeURIComponent(shot.user.github_avatar) + "&hmac=" + shot.user.hmac))
+                span
+                  a.text-dark(href="/user/" + shot.user.username) #{shot.user.name}
+          div.card-footer
+            form(method="post" enctype="multipart/form-data")
+              input(type="hidden", name='_csrf', value=csrf)
+              button.btn.btn-sm.m-1.tooltip(
+                class=(shot.bookmark && shot.bookmark.length > 0) ? "active" : ""
+                type="submit"
+                name="bookmark"
+                formaction="/action/bookmark"
+                value=shot.id
+                data-tooltip=i18n.bookmark
+              ) #{i18n.bookmark_icon} #{shot.bookmark_count}
+              button.btn.btn-sm.btn-secondary.m-1.tooltip(
+                class=(shot.flag && shot.flag.length > 0) ? "active" : ""
+                type="submit"
+                name="flag"
+                formaction="/action/flag"
+                value=shot.id
+                data-tooltip=i18n.flag
+              ) #{i18n.flag_icon} #{shot.flag_count}
+              a.btn.btn-sm.btn-secondary.m-1.tooltip(
+                href=("/shot/" + shot.hash)
+                data-tooltip=i18n.link_tooltip
+              ) #{i18n.link_icon} #{i18n.link}
+              a.btn.btn-sm.btn-secondary.m-1.tooltip(
+                href=(service.source + meta.base_url + "/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".720p.jpg")
+                target="_blank"
+                data-tooltip=i18n.source_tooltip
+              ) #{i18n.source_icon} #{i18n.source}
+              if user && (user.is_mod || shot.user_id == user.id)
+                button.btn.btn-sm.btn-secondary.m-1.tooltip(
+                  type="submit"
+                  name="shot"
+                  formaction="/action/shot"
+                  value=shot.id
+                  data-tooltip=i18n.delete_tooltip
+                ) #{i18n.delete_icon} #{i18n.delete}
+    else
+      div.column.col-12.text-center
+        if paging.name == "/my"
+          a.btn.btn-lg.btn-secondary(href="/") #{i18n.no_upload}
+        else if paging.name == "/my/bookmarks"
+          a.btn.btn-lg.btn-secondary(href="/") #{i18n.no_bookmarks}
+        else if paging.name == "/my/flags"
+          a.btn.btn-lg.btn-secondary(href="/") #{i18n.no_flags}
+
