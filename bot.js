@@ -97,12 +97,11 @@ bot.on('inline_query', async ({ inlineQuery, answerInlineQuery }) => {
     return {
       type: 'photo',
       id: shot.hash,
-      photo_url: settings.site.meta.base_url + "/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".1080p.jpg",
+      photo_url: settings.site.meta.base_url + "/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".720p.jpg",
       thumb_url: settings.site.meta.base_url + "/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".720p.jpg",
-      photo_width: 1920,
-      photo_height: 1080,
-      caption: shot.text + " [" + settings.site.meta.base_url + "/shot/" + shot.hash + "](source)",
-      parse_mode: 'markdown'
+      photo_width: 1280,
+      photo_height: 720,
+      caption: shot.text
     }
   });
 
