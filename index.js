@@ -36,7 +36,10 @@ app.use(koaStatic(__dirname + '/public', {
   maxage: 1000 * 86400 * 30
 }));
 app.use(koaViews(__dirname + '/views', {
-  extension: 'pug'
+  extension: 'pug',
+  options: {
+    cache: true
+  }
 }));
 app.use(koaBody({
   multipart: true,
