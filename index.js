@@ -32,7 +32,9 @@ setupRouter(router, settings);
 const app = new koa();
 
 app.use(koaLogger());
-app.use(koaStatic(__dirname + '/public'));
+app.use(koaStatic(__dirname + '/public', {
+  maxage: 1000 * 86400 * 30
+}));
 app.use(koaViews(__dirname + '/views', {
   extension: 'pug'
 }));
