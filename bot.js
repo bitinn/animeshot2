@@ -84,6 +84,8 @@ bot.on('inline_query', async ({ inlineQuery, answerInlineQuery }) => {
   const offset = parseInt(inlineQuery.offset) || 0;
   const search = inlineQuery.query;
   const text = romanize(search);
+
+  await db.ready();
   const shots = await searchShots(text, 20, offset);
 
   if (!shots) {
