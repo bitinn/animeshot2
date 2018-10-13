@@ -49,4 +49,4 @@ app.use(koaSession(settings.cookie.session, app));
 app.use(koaMount(grant(settings.oauth)));
 app.use(router.middleware());
 
-app.listen(settings.site.port);
+app.listen(settings.site.server.port);
