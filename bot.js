@@ -96,6 +96,7 @@ bot.on('inline_query', async ({ inlineQuery, answerInlineQuery }) => {
   const results = shotArray.map((shot) => {
     return {
       type: 'photo',
+      id: shot.hash,
       photo_url: settings.site.meta.base_url + "/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".1080p.jpg",
       thumb_url: settings.site.meta.base_url + "/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".720p.jpg",
       photo_width: 1920,
