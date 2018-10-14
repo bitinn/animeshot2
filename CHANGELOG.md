@@ -1,6 +1,10 @@
 
 # changelog
 
+## v0.8.0
+
+- enhance: legacy database import
+
 ## v0.7.1
 
 - enhance: readme
