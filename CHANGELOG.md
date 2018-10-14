@@ -1,6 +1,11 @@
 
 # changelog
 
+## v0.7.1
+
+- enhance: readme
+- fix: twitter login
+
 ## v0.7.0
 
 - enhance: user registration
