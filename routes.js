@@ -378,6 +378,36 @@ module.exports = function setupRouter (router, settings) {
     const user = await findCurrentUser(ctx);
     const id = user ? user.id : -1;
     const shots = await findRecentShots(id, 4, 0);
+    const loginSuccess = ctx.flash('login-success');
+    const loginError = ctx.flash('login-error');
+    const uploadSuccess = ctx.flash('upload-success');
+    const uploadError = ctx.flash('upload-error');
+
+    // flash message handling
+    let flash = null;
+    if (loginSuccess.length > 0) {
+      flash = {
+        type: 'login-success',
+        message: loginSuccess[0]
+      }
+    } else if (loginError.length > 0) {
+      flash = {
+        type: 'login-error',
+        message: loginError[0]
+      }
+    } else if (uploadSuccess.length > 0) {
+      flash = {
+        type: 'upload-success',
+        message: uploadSuccess[0]
+      }
+    } else if (uploadError.length > 0) {
+      flash = {
+        type: 'upload-error',
+        message: uploadError[0]
+      }
+    }
+
+    console.log(flash);
 
     // toJson flatten db result into plain object
     const data = {
@@ -389,7 +419,8 @@ module.exports = function setupRouter (router, settings) {
         name: '/index',
       },
       csrf: ctx.csrf,
-      service: settings.site.service
+      service: settings.site.service,
+      flash: flash
     };
   
     await ctx.render('page-index', data);
@@ -1117,10 +1148,19 @@ module.exports = function setupRouter (router, settings) {
   //
   router.get('/duplicate/:keyword', async (ctx) => {
     const search = ctx.request.params.keyword;
+    const uploadError = ctx.flash('upload-error');
 
     if (!search) {
       ctx.redirect('/');
       return;
+    }
+
+    let flash;
+    if (uploadError.length > 0) {
+      flash = {
+        type: 'upload-error',
+        message: uploadError[0]
+      };
     }
 
     // romanize search string
@@ -1142,7 +1182,8 @@ module.exports = function setupRouter (router, settings) {
       },
       search: search,
       csrf: ctx.csrf,
-      service: settings.site.service
+      service: settings.site.service,
+      flash: flash
     };
   
     await ctx.render('page-index', data);
@@ -1289,7 +1330,8 @@ module.exports = function setupRouter (router, settings) {
     const user = await findCurrentUser(ctx);
 
     if (!user) {
-      ctx.redirect('/login');
+      ctx.flash('upload-error', 'you must login first');
+      ctx.redirect('/');
       return;
     }
 
@@ -1298,17 +1340,21 @@ module.exports = function setupRouter (router, settings) {
 
     // both image and text must be available, text must have reasonable length
     if (!shot || !text || text.length > 255) {
-      ctx.redirect('back');
+      ctx.flash('upload-error', 'image or text missing, or text is too long');
+      ctx.redirect('/');
       return;
     }
 
     // check for duplicate text
-    const search = romanize(text);
-    const shots = await duplicateShots(search, user.id, 4, 0);
+    if (text.length > 4) {
+      const search = romanize(text);
+      const shots = await duplicateShots(search, user.id, 4, 0);
 
-    if (shots.length > 1) {
-      ctx.redirect('/duplicate/' + encodeURIComponent(text));
-      return;
+      if (shots.length > 1) {
+        ctx.flash('upload-error', 'found duplicate images');
+        ctx.redirect('/duplicate/' + encodeURIComponent(text));
+        return;
+      }
     }
 
     // create image hash
@@ -1353,13 +1399,15 @@ module.exports = function setupRouter (router, settings) {
       }).toFile(__dirname + '/public/uploads/' + folder + '/' + hash + '.2160p.jpg');
     } catch (err) {
       console.error(err);
-      ctx.redirect('back');
+      ctx.flash('upload-error', 'image processing issue');
+      ctx.redirect('/');
       return;
     }
 
     // now create the entry
+    let shotEntry;
     try {
-      let shot = {
+      shotEntry = {
         hash: hash,
         text: text,
         romanized: romanize(text),
@@ -1372,12 +1420,16 @@ module.exports = function setupRouter (router, settings) {
         updated: new Date()
       }
 
-      shot = await createShot(shot);
+      shotEntry = await createShot(shotEntry);
     } catch (err) {
       console.error(err);
+      ctx.flash('upload-error', 'database issue');
+      ctx.redirect('/');
+      return;
     }
 
-    ctx.redirect('back');
+    ctx.flash('upload-success', shotEntry.hash);
+    ctx.redirect('/');
   });
 
   //
@@ -1386,14 +1438,16 @@ module.exports = function setupRouter (router, settings) {
   router.get(settings.oauth.server.callback, async (ctx) => {
     // no session data
     if (!ctx.session || !ctx.session.grant) {
-      ctx.redirect('/login');
+      ctx.flash('login-error', 'missing session');
+      ctx.redirect('/');
       return;
     }
 
     // missing token, no response or unsupported provider
     const oauthResult = ctx.session.grant;
     if (!settings.oauth[oauthResult.provider] || !oauthResult.response || !oauthResult.response.access_token) {
-      ctx.redirect('/login');
+      ctx.flash('login-error', 'missing token');
+      ctx.redirect('/');
       return;
     }
 
@@ -1403,15 +1457,20 @@ module.exports = function setupRouter (router, settings) {
     };
 
     let fetchProfile;
-    if (oauthResult.provider == 'github') {
-      fetchProfile = await githubAPI.get('user').auth(oauthResult.response.access_token).options(requestOptions).request();
+    try {
+      if (oauthResult.provider == 'github') {
+        fetchProfile = await githubAPI.get('user').auth(oauthResult.response.access_token).options(requestOptions).request();
 
-    } else if (oauthResult.provider == 'twitter') {
-      fetchProfile = await twitterAPI.get('account/verify_credentials').auth(oauthResult.response.access_token, oauthResult.response.access_secret).options(requestOptions).request();
+      } else if (oauthResult.provider == 'twitter') {
+        fetchProfile = await twitterAPI.get('account/verify_credentials').auth(oauthResult.response.access_token, oauthResult.response.access_secret).options(requestOptions).request();
+      }
+    } catch (err) {
+      console.error(err);
     }
 
     if (!fetchProfile) {
-      ctx.redirect('/login');
+      ctx.flash('login-error', 'fetch profile error');
+      ctx.redirect('/');
       return;
     }
 
@@ -1422,18 +1481,27 @@ module.exports = function setupRouter (router, settings) {
     await db.ready();
     let localUser = await findOAuthUser(oauthResult, userProfile);
 
-    try {
-      if (!localUser) {
-        localUser = await createUser(oauthResult, userProfile);
-      }
-    } catch (err) {
-      console.error(err);
+    if (localUser) {
+      // update session cookie
+      ctx.session = { user: { id: localUser.id } };
+
+      // update flash message
+      ctx.flash('login-success', localUser.name);
       ctx.redirect('/');
       return;
     }
 
-    // update session cookie
+    try {
+      localUser = await createUser(oauthResult, userProfile);
+    } catch (err) {
+      console.error(err);
+      ctx.flash('login-error', 'username alraedy taken');
+      ctx.redirect('/');
+      return;
+    }
+
     ctx.session = { user: { id: localUser.id } };
+    ctx.flash('login-success', localUser.name);
     ctx.redirect('/');
   });
 

@@ -21,3 +21,23 @@
 .upload-region {
   background-color: #f8f9fa;
 }
+
+.flash-success {
+  background-color: #32b643;
+  color: #fff;
+}
+
+.flash-success a, .flash-success a:hover, .flash-success a:focus {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.flash-error {
+  background-color: #e85600;
+  color: #fff;
+}
+
+.flash-error a, .flash-error a:hover, .flash-error a:focus {
+  color: #fff;
+  text-decoration: underline;
+}

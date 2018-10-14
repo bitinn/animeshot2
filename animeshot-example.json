@@ -6,7 +6,8 @@
       "tagline": "your site description",
       "logo": "/images/logo.jpg",
       "lang": "en",
-      "base_url": "https://your.site.domain"
+      "base_url": "https://your.site.domain",
+      "version": "0.6.0"
     },
     "service": {
       "source": "https://whatanime.ga/?url=",

@@ -16,10 +16,11 @@ const koaMount = require('koa-mount');
 const koaBody = require('koa-body');
 const koaCSRF = require('koa-csrf');
 const koaSSL = require('koa-sslify');
+const koaFlash = require('koa-better-flash');
 
 const grant = require('grant-koa');
 
-const setupRouter = require('./routes');
+const setupRouter = require(__dirname + '/routes');
 const settings = require(__dirname + '/animeshot.json');
 const i18n = require(__dirname + '/i18n.json');
 settings.site.i18n = i18n;
@@ -62,6 +63,7 @@ app.use(new koaCSRF());
 
 app.keys = settings.cookie.keys;
 app.use(koaSession(settings.cookie.session, app));
+app.use(koaFlash());
 
 app.use(koaMount(grant(settings.oauth)));
 app.use(router.middleware());

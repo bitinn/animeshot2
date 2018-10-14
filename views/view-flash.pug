@@ -1,0 +1,14 @@
+div.columns
+  if flash.type == "login-success"
+    div.div.column.col-12.p-2.mb-2.flash-success
+      p.h5.m-2.text-center Welcome Back, #{flash.message}!
+  if flash.type == "login-error"
+    div.div.column.col-12.p-2.mb-2.flash-error
+      p.h5.m-2.text-center Login Error: #{flash.message}?
+  if flash.type == "upload-success"
+    div.div.column.col-12.p-2.mb-2.flash-success
+      p.h5.m-2.text-center Upload Done, 
+        a.text-gray(href="/shot/" + flash.message) View Shot
+  if flash.type == "upload-error"
+    div.div.column.col-12.p-2.mb-2.flash-error
+      p.h5.m-2.text-center Upload Error: #{flash.message}?

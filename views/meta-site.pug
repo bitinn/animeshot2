@@ -3,9 +3,9 @@ head
   meta(name="viewport" content="width=device-width, initial-scale=1.0")
   meta(name="referrer" content="same-origin")
   title #{meta.title}
-  link(rel="stylesheet" href="/css/spectre.min.css")
-  link(rel="stylesheet" href="/css/animeshot.css")
-  script(src="/js/animeshot.js" defer async)
+  link(rel="stylesheet" href="/css/spectre.min.css?" + meta.version)
+  link(rel="stylesheet" href="/css/animeshot.css?" + meta.version)
+  script(src=("/js/animeshot.js?" + meta.version) defer async)
   if shot
     meta(name="twitter:card" content="summary_large_image")
     meta(name="twitter:site" content="@" + meta.owner)

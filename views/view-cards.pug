@@ -1,4 +1,6 @@
 div.column.col-10.col-md-9.col-sm-8.col-xs-12
+  if flash
+    include view-flash.pug
   if paging.name == "/index"
     include view-upload.pug
   div.columns
