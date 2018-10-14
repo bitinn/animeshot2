@@ -5,6 +5,16 @@ An open and searchable image repository with telegram bot integration
 
 (using nodejs + sqlite)
 
+## What's new from v1
+
+- Better image resize (and up to 4K screenshot support)
+- OAuth login so users can manage their own content
+- Moderator support
+- User bookmarks and flags
+- Telegram bot built-in support
+
+(v2 however isn't compatible with v1, due to image quality difference and database backend change)
+
 ## Usage
 
 1. Have [nodejs](https://nodejs.org/en/download/current/) installed.
@@ -21,6 +31,8 @@ An open and searchable image repository with telegram bot integration
 7. Access `localhost` or your domain
 8. To actually login and upload images: you need to create a [GitHub](https://developer.github.com/apps/building-oauth-apps/creating-an-oauth-app/) or (Twitter)[https://developer.twitter.com/] app for OAuth authentication. We recommend starting with GitHub as it's faster.
 
+(we might add a local password login in future, but for now, you need an OAuth provider)
+
 ## Telegram Bot
 
 1. Make sure your site is up and running
@@ -28,6 +40,14 @@ An open and searchable image repository with telegram bot integration
 3. Edit the config **(see guide below)**
 4. `npm run bot`
 5. Now you should be able to type `@yourbot some-text` to search the animeshot database
+
+## Other Tricks
+
+- `npm run db:mod -- username` will prompt `username` into moderator
+- `npm run db:seed` will seed database with some test data
+- `npm run db:reset` clean up the database
+- `npm run db:drop` drop all tables
+- `npm run dev` launch auto-reload dev server for development
 
 ## Config
 
