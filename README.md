@@ -29,7 +29,7 @@ An open and searchable image repository with telegram bot integration
   - you may need `sudo` due to restriction on port 80/443
   - but don't run your public server with `sudo`, instead, do [this](https://stackoverflow.com/questions/16573668/best-practices-when-running-node-js-with-port-80-ubuntu-linode)
 7. Access `localhost` or your domain
-8. To actually login and upload images: you need to create a [GitHub](https://developer.github.com/apps/building-oauth-apps/creating-an-oauth-app/) or (Twitter)[https://developer.twitter.com/] app for OAuth authentication. We recommend starting with GitHub as it's faster.
+8. To actually login and upload images: you need to create a [GitHub](https://developer.github.com/apps/building-oauth-apps/creating-an-oauth-app/) or [Twitter](https://developer.twitter.com/) app for OAuth authentication. We recommend starting with GitHub as it's faster.
 
 (we might add a local password login in future, but for now, you need an OAuth provider)
 
