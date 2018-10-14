@@ -13,6 +13,10 @@ const cuid = require('cuid');
 const createDirectory = require('make-dir');
 const delFiles = require('del');
 
+const settings = require(__dirname + '/animeshot.json');
+const i18n = require(__dirname + '/i18n.json');
+settings.site.i18n = i18n;
+
 // define models
 
 const db = new openrecord({
@@ -52,7 +56,7 @@ db.Model('flags', function () {
 // define oauth sign-in
 
 const githubAPI = purest({ provider: 'github', config: providers });
-const twitterAPI = purest({ provider: 'twitter', config: providers });
+const twitterAPI = purest({ provider: 'twitter', config: providers, key: settings.oauth.twitter.key, secret: settings.oauth.twitter.secret });
 
 // workaround: disable custom inspect function when using console log
 
@@ -371,7 +375,7 @@ async function createShot (shot) {
 // define routes
 //
 
-module.exports = function setupRouter (router, settings) {
+module.exports = function setupRouter (router) {
   //
   // index page
   //
@@ -1445,7 +1449,7 @@ module.exports = function setupRouter (router, settings) {
     // missing token, no response or unsupported provider
     const oauthResult = ctx.session.grant;
     if (!settings.oauth[oauthResult.provider] || !oauthResult.response || !oauthResult.response.access_token) {
-      ctx.flash('login-error', 'missing token');
+      ctx.flash('login-error', 'missing token or remote server issue');
       ctx.redirect('/');
       return;
     }
@@ -1468,7 +1472,7 @@ module.exports = function setupRouter (router, settings) {
     }
 
     if (!fetchProfile || fetchProfile.length != 2) {
-      ctx.flash('login-error', 'fetch profile error');
+      ctx.flash('login-error', 'fetch profile network error');
       ctx.redirect('/');
       return;
     }
@@ -1477,7 +1481,7 @@ module.exports = function setupRouter (router, settings) {
     const userProfile = fetchProfile[1];
 
     if (!userProfile.id) {
-      ctx.flash('login-error', 'profile id missing');
+      ctx.flash('login-error', 'remote profile id missing');
       ctx.redirect('/');
       return;
     }

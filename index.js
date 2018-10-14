@@ -28,7 +28,7 @@ settings.site.i18n = i18n;
 // define routing
 
 const router = new koaRouter();
-setupRouter(router, settings);
+setupRouter(router);
 
 // define app
 
