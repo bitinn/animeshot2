@@ -132,8 +132,8 @@ async function importDatabase () {
     // clean up legacy files
     await delFiles([
       __dirname + '/../public/legacy/' + shot.hash + '.300.jpg',
-      __dirname + '../public/legacy/' + shot.hash + '.600.jpg',
-      __dirname + '../public/legacy/' + shot.hash + '.1200.jpg'
+      __dirname + '/../public/legacy/' + shot.hash + '.600.jpg',
+      __dirname + '/../public/legacy/' + shot.hash + '.1200.jpg'
     ]);
 
     i++;
