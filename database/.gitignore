@@ -1,2 +1,4 @@
 *.sqlite
 *.sqlite-journal
+*.bson
+*.json

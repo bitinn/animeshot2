@@ -8,10 +8,16 @@ div.column.col-10.col-md-9.col-sm-8.col-xs-12
       div.column.col-6.col-sm-12.mt-2
         div.card
           div.card-image
-            img.img-responsive(
-              src=("/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".720p.jpg")
-              alt=shot.text
-            )
+            if !shot.legacy
+              img.img-responsive(
+                src=("/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".720p.jpg")
+                alt=shot.text
+              )
+            else
+              img.img-responsive(
+                src=("/uploads/legacy/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".1200.jpg")
+                alt=shot.text
+              )
           div.card-body
             if shot.text
               p #{shot.text}
@@ -48,11 +54,18 @@ div.column.col-10.col-md-9.col-sm-8.col-xs-12
                 href=("/shot/" + shot.hash)
                 data-tooltip=i18n.link_tooltip
               ) #{i18n.link_icon} #{i18n.link}
-              a.btn.btn-sm.btn-secondary.m-1.tooltip(
-                href=(service.source + meta.base_url + "/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".720p.jpg")
-                target="_blank"
-                data-tooltip=i18n.source_tooltip
-              ) #{i18n.source_icon} #{i18n.source}
+              if !shot.legacy
+                a.btn.btn-sm.btn-secondary.m-1.tooltip(
+                  href=(service.source + meta.base_url + "/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".720p.jpg")
+                  target="_blank"
+                  data-tooltip=i18n.source_tooltip
+                ) #{i18n.source_icon} #{i18n.source}
+              else
+                a.btn.btn-sm.btn-secondary.m-1.tooltip(
+                  href=(service.source + meta.base_url + "/uploads/legacy/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".1200.jpg")
+                  target="_blank"
+                  data-tooltip=i18n.source_tooltip
+                ) #{i18n.source_icon} #{i18n.source}
               if user && (user.is_mod || shot.user_id == user.id)
                 button.btn.btn-sm.btn-secondary.m-1.tooltip(
                   type="submit"

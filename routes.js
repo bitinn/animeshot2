@@ -1309,12 +1309,19 @@ module.exports = function setupRouter (router) {
 
       // delete files
       const folder = shot.hash.substring(shot.hash.length - 2);
-      await delFiles([
-        __dirname + '/public/uploads/' + folder + "/" + shot.hash + ".720p.jpg",
-        __dirname + '/public/uploads/' + folder + "/" + shot.hash + ".1080p.jpg",
-        __dirname + '/public/uploads/' + folder + "/" + shot.hash + ".1440p.jpg",
-        __dirname + '/public/uploads/' + folder + "/" + shot.hash + ".2160p.jpg"
-      ]);
+
+      if (!shot.legacy) {
+        await delFiles([
+          __dirname + '/public/uploads/' + folder + '/' + shot.hash + '.720p.jpg',
+          __dirname + '/public/uploads/' + folder + '/' + shot.hash + '.1080p.jpg',
+          __dirname + '/public/uploads/' + folder + '/' + shot.hash + '.1440p.jpg',
+          __dirname + '/public/uploads/' + folder + '/' + shot.hash + '.2160p.jpg'
+        ]);
+      } else {
+        await delFiles([
+          __dirname + '/public/uploads/legacy/' + folder + '/' + shot.hash + '.1200.jpg'
+        ]);
+      }
 
       // delete actual shot
       await shot.delete();
@@ -1373,8 +1380,9 @@ module.exports = function setupRouter (router) {
 
       // size check
       if (data.width < 1280 || data.width > 5120 || data.height < 720 || data.height > 2880) {
-        console.error("image size: " + data.width + "x" + data.height + " out of range");
-        ctx.redirect('back');
+        ctx.flash('upload-error', 'image size: ' + data.width + 'x' + data.height + ' out of range');
+        ctx.redirect('/');
+        return;
       }
 
       await sharp(shot.path).limitInputPixels(5120 * 2880).resize(1280, 720, {

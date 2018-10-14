@@ -22,7 +22,7 @@ An open and searchable image repository with telegram bot integration
 3. Unzip and `cd` into your folder
 4. Run these commands in order:
   - `npm install`
-  - `npm run db:migirate`
+  - `npm run db:migrate`
 5. Edit the config **(see guide below)**
 6. Run these commands to start the server
   - `npm start`
@@ -44,6 +44,7 @@ An open and searchable image repository with telegram bot integration
 ## Other Tricks
 
 - `npm run db:mod -- username` will prompt `username` into moderator
+- `npm run db:import -- v1.json` will import json data extracted from v1 animeshot database (`mongodump` then `bsondump`)
 - `npm run db:seed` will seed database with some test data
 - `npm run db:reset` clean up the database
 - `npm run db:drop` drop all tables

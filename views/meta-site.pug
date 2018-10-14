@@ -11,7 +11,10 @@ head
     meta(name="twitter:site" content="@" + meta.owner)
     meta(name="twitter:title" content=meta.title)
     meta(name="twitter:description" content=shot.text)
-    meta(name="twitter:image" content=(meta.base_url + "/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".720p.jpg"))
+    if !shot.legacy
+      meta(name="twitter:image" content=(meta.base_url + "/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".720p.jpg"))
+    else
+      meta(name="twitter:image" content=(meta.base_url + "/uploads/legacy/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".1200.jpg"))
     meta(name="twitter:image:alt" content="shot image")
   else
     meta(name="twitter:card" content="summary")

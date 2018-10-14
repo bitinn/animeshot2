@@ -1,10 +1,16 @@
 div.column.col-10.col-md-9.col-sm-8.col-xs-12
   div.card
     div.card-image
-      img.img-responsive(
-        src=("/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".720p.jpg")
-        alt=shot.text
-      )
+      if !shot.legacy
+        img.img-responsive(
+          src=("/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".720p.jpg")
+          alt=shot.text
+        )
+      else
+        img.img-responsive(
+          src=("/uploads/legacy/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".1200.jpg")
+          alt=shot.text
+        )
     div.card-body
       if shot.text
         p.h4 #{shot.text}
@@ -41,11 +47,18 @@ div.column.col-10.col-md-9.col-sm-8.col-xs-12
           href=("/shot/" + shot.hash)
           data-tooltip=i18n.link_tooltip
         ) #{i18n.link_icon} #{i18n.link}
-        a.btn.btn-sm.btn-secondary.m-1.tooltip(
-          href=(service.source + meta.base_url + "/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".720p.jpg")
-          target="_blank"
-          data-tooltip=i18n.source_tooltip
-        ) #{i18n.source_icon} #{i18n.source}
+        if !shot.legacy
+          a.btn.btn-sm.btn-secondary.m-1.tooltip(
+            href=(service.source + meta.base_url + "/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".720p.jpg")
+            target="_blank"
+            data-tooltip=i18n.source_tooltip
+          ) #{i18n.source_icon} #{i18n.source}
+        else
+          a.btn.btn-sm.btn-secondary.m-1.tooltip(
+            href=(service.source + meta.base_url + "/uploads/legacy/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".1200.jpg")
+            target="_blank"
+            data-tooltip=i18n.source_tooltip
+          ) #{i18n.source_icon} #{i18n.source}
         a.btn.btn-sm.btn-secondary.m-1.tooltip(
           href=(service.twitter + meta.base_url + "/shot/" + shot.hash + "&text=" + shot.text)
           target="_blank"
@@ -63,12 +76,16 @@ div.column.col-10.col-md-9.col-sm-8.col-xs-12
       div.divider
       p.h5 #{i18n.click_to_copy}
       div.form-group
-        label.form-label(for="p720") 720p (1280x720)
-        input.form-input(type="text" name="p720" placeholder="" readonly value=(meta.base_url + "/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".720p.jpg") onclick='copyInput(this)')
-        label.form-label(for="p1080") 1080p (1920x1080)
-        input.form-input(type="text" name="p1080" placeholder="" readonly value=(meta.base_url + "/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".1080p.jpg") onclick='copyInput(this)')
-        label.form-label(for="p1440") 1440p (2560x1440)
-        input.form-input(type="text" name="p1440" placeholder="" readonly value=(meta.base_url + "/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".1440p.jpg") onclick='copyInput(this)')
-        label.form-label(for="p2160") 2160p (3840x2160)
-        input.form-input(type="text" name="p2160" placeholder="" readonly value=(meta.base_url + "/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".2160p.jpg") onclick='copyInput(this)')
+        if !shot.legacy
+          label.form-label(for="p720") 720p (1280x720)
+          input.form-input(type="text" name="p720" placeholder="" readonly value=(meta.base_url + "/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".720p.jpg") onclick='copyInput(this)')
+          label.form-label(for="p1080") 1080p (1920x1080)
+          input.form-input(type="text" name="p1080" placeholder="" readonly value=(meta.base_url + "/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".1080p.jpg") onclick='copyInput(this)')
+          label.form-label(for="p1440") 1440p (2560x1440)
+          input.form-input(type="text" name="p1440" placeholder="" readonly value=(meta.base_url + "/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".1440p.jpg") onclick='copyInput(this)')
+          label.form-label(for="p2160") 2160p (3840x2160)
+          input.form-input(type="text" name="p2160" placeholder="" readonly value=(meta.base_url + "/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".2160p.jpg") onclick='copyInput(this)')
+        else
+          label.form-label(for="w1200") Legacy (~1200x675)
+          input.form-input(type="text" name="w1200" placeholder="" readonly value=(meta.base_url + "/uploads/legacy/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".1200.jpg") onclick='copyInput(this)')
 

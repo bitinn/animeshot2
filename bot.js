@@ -96,15 +96,24 @@ bot.on('inline_query', async ({ inlineQuery, answerInlineQuery }) => {
 
   const shotArray = shots.toJson();
   const results = shotArray.map((shot) => {
-    return {
+    let output = {
       type: 'photo',
       id: shot.hash,
-      photo_url: settings.site.meta.base_url + "/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".1080p.jpg",
-      thumb_url: settings.site.meta.base_url + "/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".720p.jpg",
       photo_width: 1920,
       photo_height: 1080,
       caption: shot.text
+    };
+
+    // legacy file support
+    if (!shot.legacy) {
+      output.photo_url = settings.site.meta.base_url + '/uploads/' + shot.hash.substring(shot.hash.length - 2) + '/' + shot.hash + '.1080p.jpg';
+      output.thumb_url = settings.site.meta.base_url + '/uploads/' + shot.hash.substring(shot.hash.length - 2) + '/' + shot.hash + '.720p.jpg';
+    } else {
+      output.photo_url = settings.site.meta.base_url + '/uploads/legacy/' + shot.hash.substring(shot.hash.length - 2) + '/' + shot.hash + '.1200.jpg';
+      output.thumb_url = settings.site.meta.base_url + "/uploads/legacy/" + shot.hash.substring(shot.hash.length - 2) + '/' + shot.hash + '.1200.jpg';
     }
+
+    return output;
   });
 
   return answerInlineQuery(results, { next_offset: offset + 20 });
