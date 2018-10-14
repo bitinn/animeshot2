@@ -8,4 +8,6 @@ html(lang=en)
         include view-nav.pug
         if paging.name == '/guide/content'
           include guide-content.pug
+        if paging.name == '/guide/usage'
+          include guide-usage.pug
       include view-footer.pug

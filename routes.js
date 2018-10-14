@@ -1458,5 +1458,23 @@ module.exports = function setupRouter (router, settings) {
     await ctx.render('page-guide', data);
   });
 
+  router.get('/guide/usage', async (ctx) => {
+    await db.ready();
+    const user = await findCurrentUser(ctx);
+
+    // toJson flatten db result into plain object
+    const data = {
+      meta: settings.site.meta,
+      i18n: settings.site.i18n[settings.site.meta.lang],
+      user: user ? user.toJson() : null,
+      paging: {
+        name: '/guide/usage'
+      },
+      csrf: ctx.csrf,
+    };
+  
+    await ctx.render('page-guide', data);
+  });
+
   return router;
 }

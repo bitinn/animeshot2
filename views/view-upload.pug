@@ -2,8 +2,10 @@ div.columns
   div.column.col-12.p-2.mb-2.upload-region
     if user
       p.h5 #{i18n.please_read}
-        | 
+        |  - 
         a(href="/guide/content") #{i18n.guide_content}
+        |  - 
+        a(href="/guide/usage") #{i18n.guide_usage}
       form(method="post" enctype="multipart/form-data")
         div.form-group
           input(type="hidden", name='_csrf', value=csrf)
