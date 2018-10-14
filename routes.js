@@ -336,19 +336,21 @@ async function createUser (oauthResult, userProfile) {
 
   if (oauthResult.provider == 'github') {
     newUser = {
-      username: userProfile.login,
+      username: cuid(),
       name: userProfile.name,
       github_id: userProfile.id,
       github_avatar: userProfile.avatar_url,
+      github_username: userProfile.login,
       created: new Date(),
       updated: new Date()
     };
   } else if (oauthResult.provider == 'twitter') {
     newUser = {
-      username: userProfile.screen_name,
+      username: cuid(),
       name: userProfile.name,
       twitter_id: userProfile.id,
       twitter_avatar: userProfile.profile_image_url_https,
+      twitter_username: userProfile.screen_name,
       created: new Date(),
       updated: new Date()
     };
