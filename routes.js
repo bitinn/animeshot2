@@ -1338,8 +1338,8 @@ module.exports = function setupRouter (router, settings) {
     const text = ctx.request.body.text;
 
     // both image and text must be available, text must have reasonable length
-    if (!shot || !text || text.length > 255) {
-      ctx.flash('upload-error', 'image or text missing, or text is too long');
+    if (!shot || shot.size < 100 || !text || text.length > 255) {
+      ctx.flash('upload-error', 'image or text missing, or image size too small, or text length too long');
       ctx.redirect('/');
       return;
     }
@@ -1467,7 +1467,7 @@ module.exports = function setupRouter (router, settings) {
       console.error(err);
     }
 
-    if (!fetchProfile) {
+    if (!fetchProfile || fetchProfile.length != 2) {
       ctx.flash('login-error', 'fetch profile error');
       ctx.redirect('/');
       return;
@@ -1475,6 +1475,12 @@ module.exports = function setupRouter (router, settings) {
 
     // [0] is full response, [1] is response body
     const userProfile = fetchProfile[1];
+
+    if (!userProfile.id) {
+      ctx.flash('login-error', 'profile id missing');
+      ctx.redirect('/');
+      return;
+    }
 
     // find or create it in database
     await db.ready();
