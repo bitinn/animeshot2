@@ -409,8 +409,6 @@ module.exports = function setupRouter (router, settings) {
       }
     }
 
-    console.log(flash);
-
     // toJson flatten db result into plain object
     const data = {
       meta: settings.site.meta,
@@ -1167,7 +1165,6 @@ module.exports = function setupRouter (router, settings) {
 
     // romanize search string
     const text = romanize(search);
-    console.log(text);
 
     await db.ready();
     const user = await findCurrentUser(ctx);
