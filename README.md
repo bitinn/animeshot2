@@ -3,6 +3,8 @@
 
 An open and searchable image repository with telegram bot integration
 
+(using nodejs + sqlite)
+
 ## Usage
 
 1. Have [nodejs](https://nodejs.org/en/download/current/) installed.
@@ -31,7 +33,7 @@ An open and searchable image repository with telegram bot integration
 
 This is the full config with explanation, but since it's just a JSON file, you shouldn't copy this one, instead: `cp animeshot-example.json animeshot.json`.
 
-```json
+```javascript
 {
   "site": {
     "meta": {
