@@ -4,7 +4,7 @@
       "title": "AnimeShot",
       "owner": "your twitter handle",
       "tagline": "your site description",
-      "logo": "/images/animeshot.jpg",
+      "logo": "/images/logo.jpg",
       "lang": "en",
       "base_url": "https://your.site.domain"
     },
@@ -22,7 +22,7 @@
     }
   },
   "cookie": {
-    "keys": ["keep this secret"],
+    "keys": ["keep this string secret"],
     "session": {
       "signed": true,
       "maxAge": 86400000,

@@ -24,8 +24,6 @@ const settings = require(__dirname + '/animeshot.json');
 const i18n = require(__dirname + '/i18n.json');
 settings.site.i18n = i18n;
 
-console.log(i18n);
-
 // define routing
 
 const router = new koaRouter();
