@@ -5,7 +5,7 @@ An open and searchable image repository with telegram bot integration
 
 (using nodejs + sqlite)
 
-## What's new from v1
+## What's New in V2
 
 - Better image resize (and up to 4K screenshot support)
 - OAuth login so users can manage their own content
@@ -41,7 +41,7 @@ An open and searchable image repository with telegram bot integration
 4. `npm run bot`
 5. Now you should be able to type `@yourbot some-text` to search the animeshot database
 
-## Other Tricks
+## Other Commands
 
 - `npm run db:mod -- username` will prompt `username` into moderator
 - `npm run db:import -- v1.json` will import json data extracted from v1 animeshot database (`mongodump` then `bsondump`)
@@ -50,7 +50,7 @@ An open and searchable image repository with telegram bot integration
 - `npm run db:drop` drop all tables
 - `npm run dev` launch auto-reload dev server for development
 
-## Config
+## Site Config
 
 This is the full config with explanation, but since it's just a JSON file, you shouldn't copy this one, instead: `cp animeshot-example.json animeshot.json`.
 
@@ -115,6 +115,18 @@ This is the full config with explanation, but since it's just a JSON file, you s
 - For localhost, you want to [read this guide](https://letsencrypt.org/docs/certificates-for-localhost/) to generate test cert/key files and put them in the `ssl` folder.
 - For public server, you want to [use certbot](https://certbot.eff.org/) to generate valid cert/key and then [chmod](https://github.com/certbot/certbot/issues/5257) permission and `ln` certificate/key files to the `ssl` folder.
 - Then you can modify `ssl_certificate` and `ssl_key` in above config to use these cert and key files.
+
+## Continuous Service
+
+- Install `forever` with `sudo npm install -g forever`
+- Launch service with `forever start index.js` and `foerver start bot.js`
+- If you are using `certbot` for certificate without a reverse proxy (web server) like `nginx`, you can config `certbot` to auto restart animeshot service (so that port 80,443 is available for renewal).
+- `sudo nano /etc/letsencrypt/renewal/your.domain.conf` and add these lines:
+
+```
+pre_hook = forever stop /full-path/index.js
+post_hook = forever start /full-path/index.js
+```
 
 ## License
 
