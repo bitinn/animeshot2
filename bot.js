@@ -99,8 +99,6 @@ bot.on('inline_query', async ({ inlineQuery, answerInlineQuery }) => {
     let output = {
       type: 'photo',
       id: shot.hash,
-      photo_width: 1920,
-      photo_height: 1080,
       caption: shot.text
     };
 
@@ -108,9 +106,12 @@ bot.on('inline_query', async ({ inlineQuery, answerInlineQuery }) => {
     if (!shot.legacy) {
       output.photo_url = settings.site.meta.base_url + '/uploads/' + shot.hash.substring(shot.hash.length - 2) + '/' + shot.hash + '.1080p.jpg';
       output.thumb_url = settings.site.meta.base_url + '/uploads/' + shot.hash.substring(shot.hash.length - 2) + '/' + shot.hash + '.720p.jpg';
+      output.photo_width = 1920;
+      output.photo_height = 1080;
     } else {
       output.photo_url = settings.site.meta.base_url + '/uploads/legacy/' + shot.hash.substring(shot.hash.length - 2) + '/' + shot.hash + '.1200.jpg';
       output.thumb_url = settings.site.meta.base_url + "/uploads/legacy/" + shot.hash.substring(shot.hash.length - 2) + '/' + shot.hash + '.1200.jpg';
+      output.photo_width = 1200;
     }
 
     return output;
