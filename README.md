@@ -64,7 +64,7 @@ This is the full config with explanation, but since it's just a JSON file, you s
       "logo": "/images/logo.jpg", // site logo for twitter card
       "lang": "en", // language hint and translations, see i18n.json
       "base_url": "https://your.site.domain", // site domain name
-      "version": "0.7.0" // only used in cache bursting
+      "version": "r1" // only used in static asset cache bursting
     },
     "service": {
       "source": "https://whatanime.ga/?url=", // finding out image origin
