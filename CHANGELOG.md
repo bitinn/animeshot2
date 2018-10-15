@@ -1,6 +1,10 @@
 
 # changelog
 
+## v0.8.1
+
+- fix: telegram bot photo width
+
 ## v0.8.0
 
 - enhance: legacy database import
