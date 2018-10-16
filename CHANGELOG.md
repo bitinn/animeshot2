@@ -1,9 +1,13 @@
 
 # changelog
 
+## v0.9.1
+
+- enhance: page title and twitter card
+
 ## v0.9.0
 
-- enhance: site config loading
+- new: site config loading
 - enhance: readme on continous service
 
 ## v0.8.1
@@ -12,7 +16,7 @@
 
 ## v0.8.0
 
-- enhance: legacy database import
+- new: legacy database import
 
 ## v0.7.1
 
@@ -21,14 +25,14 @@
 
 ## v0.7.0
 
-- enhance: user registration
-- enhance: error message
-- enhance: i18n
-- enhance: twitter sharing
+- new: user registration
+- new: error message
+- fix: i18n
+- fix: twitter sharing
 
 ## v0.6.0
 
-- fix: bot interaction
+- new: bot interaction
 - fix: template caching
 
 ## v0.5.0
