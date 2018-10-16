@@ -118,14 +118,29 @@ This is the full config with explanation, but since it's just a JSON file, you s
 
 ## Continuous Service
 
+### forever
+
 - Install `forever` with `sudo npm install -g forever`
 - Launch service with `forever start index.js` and `foerver start bot.js`
-- If you are using `certbot` for certificate without a reverse proxy (web server) like `nginx`, you can config `certbot` to auto restart animeshot service (so that port 80,443 is available for renewal).
+- If you are using `certbot` for certificate without a reverse proxy (web server) like `nginx`, you can config `certbot` to auto restart animeshot service (so that port 80/443 is available for renewal).
 - `sudo nano /etc/letsencrypt/renewal/your.domain.conf` and add these lines:
 
 ```
 pre_hook = forever stop /full-path/index.js
 post_hook = forever start /full-path/index.js
+```
+
+### pm2
+
+- Install `pm2` with `sudo npm install -g pm2`
+- Launch service with `pm2 start index.js` and `pm2 start bot.js`
+- `pm2 startup` can setup startup service for you on major linux distributions (like Ubuntu 18's `systemd`)
+- If you are using `certbot` for certificate without a reverse proxy (web server) like `nginx`, you can config `certbot` to auto restart animeshot service (so that port 80/443 is available for renewal).
+- `sudo nano /etc/letsencrypt/renewal/your.domain.conf` and add these lines:
+
+```
+pre_hook = pm2 stop /full-path/index.js
+post_hook = pm2 start /full-path/index.js
 ```
 
 ## License

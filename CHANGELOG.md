@@ -1,6 +1,11 @@
 
 # changelog
 
+## v0.9.0
+
+- enhance: site config loading
+- enhance: readme on continous service
+
 ## v0.8.1
 
 - fix: telegram bot photo width
