@@ -69,6 +69,25 @@ util.inspect.defaultOptions.customInspect = false;
 // helper functions
 //
 
+function renderData (ctx, customData) {
+  // allow custom data to overwrite default data
+  return Object.assign({
+    meta: settings.site.meta,
+    i18n: settings.site.i18n[settings.site.meta.lang],
+    service: settings.site.service,
+    csrf: ctx.csrf,
+    page: {}
+  }, customData);
+}
+
+function isValidPageNumber (current, max) {
+  if (isNaN(current) || !Number.isInteger(current) || current < 2 || current > max + 1) {
+    return false;
+  }
+
+  return true;
+}
+
 function romanize (text) {
   // romanize hanzi into phonetic notation
   const textArray = pinyin(text, {
@@ -201,7 +220,7 @@ async function duplicateShots (text, id, limit = 0, offset = 0) {
   return shots;
 }
 
-async function countShots () {
+async function countRecentShots () {
   const shotModel = db.Model('shots');
   const count = await shotModel.count();
 
@@ -386,6 +405,7 @@ module.exports = function setupRouter (router) {
     const user = await findCurrentUser(ctx);
     const id = user ? user.id : -1;
     const shots = await findRecentShots(id, 4, 0);
+
     const loginSuccess = ctx.flash('login-success');
     const loginError = ctx.flash('login-error');
     const uploadSuccess = ctx.flash('upload-success');
@@ -416,19 +436,18 @@ module.exports = function setupRouter (router) {
     }
 
     // toJson flatten db result into plain object
-    const data = {
-      meta: settings.site.meta,
-      i18n: settings.site.i18n[settings.site.meta.lang],
+    const data = renderData(ctx, {
       user: user ? user.toJson() : null,
       shots: shots ? shots.toJson() : [],
-      paging: {
-        name: '/index',
-      },
-      csrf: ctx.csrf,
-      service: settings.site.service,
-      flash: flash
-    };
-  
+      flash: flash,
+      page: {
+        path: '/index'
+      }
+    });
+
+    // generate route specific page title
+    data.page.name = data.meta.tagline;
+
     await ctx.render('page-index', data);
   });
 
@@ -448,18 +467,16 @@ module.exports = function setupRouter (router) {
       return;
     }
 
-    const data = {
-      meta: settings.site.meta,
-      i18n: settings.site.i18n[settings.site.meta.lang],
+    const data = renderData(ctx, {
       user: user ? user.toJson() : null,
       shot: shot.toJson(),
-      paging: {
-        name: '/shot/' + hash,
-      },
-      csrf: ctx.csrf,
-      service: settings.site.service
-    };
-  
+      page: {
+        path: '/shot/' + hash
+      }
+    });
+
+    data.page.name = data.shot.text;
+
     await ctx.render('page-shot', data);
   });
 
@@ -468,25 +485,22 @@ module.exports = function setupRouter (router) {
   //
   router.get('/recent', async (ctx) => {
     await db.ready();
-    const page = 1;
     const user = await findCurrentUser(ctx);
     const id = user ? user.id : -1;
-    const shots = await findRecentShots(id, 10, 10 * (page - 1));
-    const count = await countShots();
+    const shots = await findRecentShots(id, 10, 0);
+    const count = await countRecentShots();
 
-    const data = {
-      meta: settings.site.meta,
-      i18n: settings.site.i18n[settings.site.meta.lang],
+    const data = renderData(ctx, {
       user: user ? user.toJson() : null,
       shots: shots ? shots.toJson() : [],
-      paging: {
-        name: '/recent',
-        current: page,
+      page: {
+        path: '/recent',
+        current: 1,
         max: Math.ceil(count / 10)
-      },
-      csrf: ctx.csrf,
-      service: settings.site.service
-    };
+      }
+    });
+
+    data.page.name = data.i18n.recent;
   
     await ctx.render('page-recent', data);
   });
@@ -495,17 +509,13 @@ module.exports = function setupRouter (router) {
   // recent shots paging
   //
   router.get('/recent/:page', async (ctx) => {
+    await db.ready();
+    const count = await countRecentShots();
+    const max = Math.ceil(count / 10);
+
     // validate page number
     const page = parseInt(ctx.request.params.page);
-    if (isNaN(page) || page < 2 || page != ctx.request.params.page) {
-      ctx.redirect('/recent');
-      return;
-    }
-
-    await db.ready();
-    const count = await countShots();
-
-    if ((page - 1) * 10 > count) {
+    if (!isValidPageNumber(page, max)) {
       ctx.redirect('/recent');
       return;
     }
@@ -514,20 +524,18 @@ module.exports = function setupRouter (router) {
     const id = user ? user.id : -1;
     const shots = await findRecentShots(id, 10, 10 * (page - 1));
 
-    const data = {
-      meta: settings.site.meta,
-      i18n: settings.site.i18n[settings.site.meta.lang],
+    const data = renderData(ctx, {
       user: user ? user.toJson() : null,
       shots: shots ? shots.toJson() : [],
-      paging: {
-        name: '/recent',
+      page: {
+        path: '/recent',
         current: page,
-        max: Math.ceil(count / 10)
-      },
-      csrf: ctx.csrf,
-      service: settings.site.service
-    };
-  
+        max: max
+      }
+    });
+
+    data.page.name = data.i18n.recent;
+
     await ctx.render('page-recent', data);
   });
 
@@ -536,26 +544,23 @@ module.exports = function setupRouter (router) {
   //
   router.get('/top', async (ctx) => {
     await db.ready();
-    const page = 1;
     const user = await findCurrentUser(ctx);
     const id = user ? user.id : -1;
-    const shots = await findTopShots(id, 10, 10 * (page - 1));
+    const shots = await findTopShots(id, 10, 0);
     const count = await countTopShots();
 
-    const data = {
-      meta: settings.site.meta,
-      i18n: settings.site.i18n[settings.site.meta.lang],
+    const data = renderData(ctx, {
       user: user ? user.toJson() : null,
       shots: shots ? shots.toJson() : [],
-      paging: {
-        name: '/top',
-        current: page,
+      page: {
+        path: '/top',
+        current: 1,
         max: Math.ceil(count / 10)
-      },
-      csrf: ctx.csrf,
-      service: settings.site.service
-    };
-  
+      }
+    });
+
+    data.page.name = data.i18n.top;
+
     await ctx.render('page-recent', data);
   });
 
@@ -563,16 +568,12 @@ module.exports = function setupRouter (router) {
   // top shots paging
   //
   router.get('/top/:page', async (ctx) => {
-    const page = parseInt(ctx.request.params.page);
-    if (isNaN(page) || page < 2 || page != ctx.request.params.page) {
-      ctx.redirect('/top');
-      return;
-    }
-
     await db.ready();
     const count = await countTopShots();
+    const max = Math.ceil(count / 10);
 
-    if ((page - 1) * 10 > count) {
+    const page = parseInt(ctx.request.params.page);
+    if (!isValidPageNumber(page, max)) {
       ctx.redirect('/top');
       return;
     }
@@ -581,20 +582,18 @@ module.exports = function setupRouter (router) {
     const id = user ? user.id : -1;
     const shots = await findTopShots(id, 10, 10 * (page - 1));
 
-    const data = {
-      meta: settings.site.meta,
-      i18n: settings.site.i18n[settings.site.meta.lang],
+    const data = renderData(ctx, {
       user: user ? user.toJson() : null,
       shots: shots ? shots.toJson() : [],
-      paging: {
-        name: '/top',
+      page: {
+        path: '/top',
         current: page,
-        max: Math.ceil(count / 10)
-      },
-      csrf: ctx.csrf,
-      service: settings.site.service
-    };
-  
+        max: max
+      }
+    });
+
+    data.page.name = data.i18n.top;
+
     await ctx.render('page-recent', data);
   });
 
@@ -605,36 +604,28 @@ module.exports = function setupRouter (router) {
     await db.ready();
     const user = await findCurrentUser(ctx);
 
-    if (!user) {
-      ctx.redirect('/');
-      return;
-    }
-
     // must be a moderator to see this page
-    if (!user.is_mod) {
+    if (!user || !user.is_mod) {
       ctx.redirect('/');
       return;
     }
 
-    const page = 1;
     const id = user ? user.id : -1;
-    const shots = await findFlagShots(id, 10, 10 * (page - 1));
+    const shots = await findFlagShots(id, 10, 0);
     const count = await countFlagShots();
 
-    const data = {
-      meta: settings.site.meta,
-      i18n: settings.site.i18n[settings.site.meta.lang],
+    const data = renderData(ctx, {
       user: user ? user.toJson() : null,
       shots: shots ? shots.toJson() : [],
-      paging: {
-        name: '/management',
-        current: page,
+      page: {
+        path: '/management',
+        current: 1,
         max: Math.ceil(count / 10)
-      },
-      csrf: ctx.csrf,
-      service: settings.site.service
-    };
-  
+      }
+    });
+
+    data.page.name = data.i18n.manage;
+
     await ctx.render('page-recent', data);
   });
 
@@ -645,24 +636,16 @@ module.exports = function setupRouter (router) {
     await db.ready();
     const user = await findCurrentUser(ctx);
 
-    if (!user) {
-      ctx.redirect('/');
-      return;
-    }
-
-    if (!user.is_mod) {
+    if (!user || !user.is_mod) {
       ctx.redirect('/');
       return;
     }
 
     const page = parseInt(ctx.request.params.page);
-    if (isNaN(page) || page < 2 || page != ctx.request.params.page) {
-      ctx.redirect('/management');
-      return;
-    }
-
     const count = await countFlagShots();
-    if ((page - 1) * 10 > count) {
+    const max = Math.ceil(count / 10);
+
+    if (!isValidPageNumber(page, max)) {
       ctx.redirect('/management');
       return;
     }
@@ -670,20 +653,18 @@ module.exports = function setupRouter (router) {
     const id = user ? user.id : -1;
     const shots = await findFlagShots(id, 10, 10 * (page - 1));
 
-    const data = {
-      meta: settings.site.meta,
-      i18n: settings.site.i18n[settings.site.meta.lang],
+    const data = renderData(ctx, {
       user: user ? user.toJson() : null,
       shots: shots ? shots.toJson() : [],
-      paging: {
-        name: '/management',
+      page: {
+        path: '/management',
         current: page,
-        max: Math.ceil(count / 10)
-      },
-      csrf: ctx.csrf,
-      service: settings.site.service
-    };
-  
+        max: max
+      }
+    });
+
+    data.page.name = data.i18n.manage;
+
     await ctx.render('page-recent', data);
   });
 
@@ -701,26 +682,23 @@ module.exports = function setupRouter (router) {
       return;
     }
 
-    const page = 1;
     const user = await findCurrentUser(ctx);
     const id = user ? user.id : -1;
-    const shots = await findUserShots(profile.id, id, 10, 10 * (page - 1));
+    const shots = await findUserShots(profile.id, id, 10, 0);
     const count = await countUserShots(profile.id);
 
-    const data = {
-      meta: settings.site.meta,
-      i18n: settings.site.i18n[settings.site.meta.lang],
+    const data = renderData(ctx, {
       user: user ? user.toJson() : null,
       shots: shots ? shots.toJson() : [],
-      paging: {
-        name: '/user/' + username,
-        current: page,
+      page: {
+        path: '/user/' + username,
+        current: 1,
         max: Math.ceil(count / 10)
-      },
-      csrf: ctx.csrf,
-      service: settings.site.service
-    };
-  
+      }
+    });
+
+    data.page.name = profile.name;
+
     await ctx.render('page-recent', data);
   });
 
@@ -739,13 +717,10 @@ module.exports = function setupRouter (router) {
     }
 
     const page = parseInt(ctx.request.params.page);
-    if (isNaN(page) || page < 2 || page != ctx.request.params.page) {
-      ctx.redirect('/user/' + username);
-      return;
-    }
-
     const count = await countUserShots(profile.id);
-    if ((page - 1) * 10 > count) {
+    const max = Math.ceil(count / 10);
+
+    if (!isValidPageNumber(page, max)) {
       ctx.redirect('/user/' + username);
       return;
     }
@@ -754,19 +729,17 @@ module.exports = function setupRouter (router) {
     const id = user ? user.id : -1;
     const shots = await findUserShots(profile.id, id, 10, 10 * (page - 1));
 
-    const data = {
-      meta: settings.site.meta,
-      i18n: settings.site.i18n[settings.site.meta.lang],
+    const data = renderData(ctx, {
       user: user ? user.toJson() : null,
       shots: shots ? shots.toJson() : [],
-      paging: {
-        name: '/user/' + username,
+      page: {
+        path: '/user/' + username,
         current: page,
-        max: Math.ceil(count / 10)
-      },
-      csrf: ctx.csrf,
-      service: settings.site.service
-    };
+        max: max
+      }
+    });
+
+    data.page.name = profile.name;
   
     await ctx.render('page-recent', data);
   });
@@ -783,24 +756,21 @@ module.exports = function setupRouter (router) {
       return;
     }
 
-    const page = 1;
-    const shots = await findUserShots(user.id, user.id, 10, 10 * (page - 1));
+    const shots = await findUserShots(user.id, user.id, 10, 0);
     const count = await countUserShots(user.id);
 
-    const data = {
-      meta: settings.site.meta,
-      i18n: settings.site.i18n[settings.site.meta.lang],
+    const data = renderData(ctx, {
       user: user ? user.toJson() : null,
       shots: shots ? shots.toJson() : [],
-      paging: {
-        name: '/my',
-        current: page,
+      page: {
+        path: '/my',
+        current: 1,
         max: Math.ceil(count / 10)
-      },
-      csrf: ctx.csrf,
-      service: settings.site.service
-    };
-  
+      }
+    });
+
+    data.page.name = data.i18n.my;
+
     await ctx.render('page-recent', data);
   });
 
@@ -817,33 +787,28 @@ module.exports = function setupRouter (router) {
     }
 
     const page = parseInt(ctx.request.params.page);
-    if (isNaN(page) || page < 2 || page != ctx.request.params.page) {
-      ctx.redirect('/my');
-      return;
-    }
-
     const count = await countUserShots(user.id);
-    if ((page - 1) * 10 > count) {
+    const max = Math.ceil(count / 10);
+
+    if (!isValidPageNumber(page, max)) {
       ctx.redirect('/my');
       return;
     }
 
     const shots = await findUserShots(user.id, user.id, 10, 10 * (page - 1));
 
-    const data = {
-      meta: settings.site.meta,
-      i18n: settings.site.i18n[settings.site.meta.lang],
+    const data = renderData(ctx, {
       user: user ? user.toJson() : null,
       shots: shots ? shots.toJson() : [],
-      paging: {
-        name: '/my',
+      page: {
+        path: '/my',
         current: page,
-        max: Math.ceil(count / 10)
-      },
-      csrf: ctx.csrf,
-      service: settings.site.service
-    };
-  
+        max: max
+      }
+    });
+
+    data.page.name = data.i18n.my;
+
     await ctx.render('page-recent', data);
   });
 
@@ -859,8 +824,7 @@ module.exports = function setupRouter (router) {
       return;
     }
 
-    const page = 1;
-    const books = await findUserBookmarks(user.id, user.id, 10, 10 * (page - 1));
+    const books = await findUserBookmarks(user.id, user.id, 10, 0);
     const count = await countUserBookmarks(user.id);
 
     // extract shot data from bookmark data
@@ -871,20 +835,18 @@ module.exports = function setupRouter (router) {
     }
 
     // since shot data is flatten already, just use it
-    const data = {
-      meta: settings.site.meta,
-      i18n: settings.site.i18n[settings.site.meta.lang],
+    const data = renderData(ctx, {
       user: user ? user.toJson() : null,
       shots: shots,
-      paging: {
-        name: '/my/bookmarks',
-        current: page,
+      page: {
+        path: '/my/bookmarks',
+        current: 1,
         max: Math.ceil(count / 10)
-      },
-      csrf: ctx.csrf,
-      service: settings.site.service
-    };
-  
+      }
+    });
+
+    data.page.name = data.i18n.bookmarks;
+
     await ctx.render('page-recent', data);
   });
 
@@ -901,13 +863,10 @@ module.exports = function setupRouter (router) {
     }
 
     const page = parseInt(ctx.request.params.page);
-    if (isNaN(page) || page < 2 || page != ctx.request.params.page) {
-      ctx.redirect('/my/bookmarks');
-      return;
-    }
-
     const count = await countUserBookmarks(user.id);
-    if ((page - 1) * 10 > count) {
+    const max = Math.ceil(count / 10);
+
+    if (!isValidPageNumber(page, max)) {
       ctx.redirect('/my/bookmarks');
       return;
     }
@@ -920,20 +879,18 @@ module.exports = function setupRouter (router) {
       shots.push(bookFlatten.shot);
     }
 
-    const data = {
-      meta: settings.site.meta,
-      i18n: settings.site.i18n[settings.site.meta.lang],
+    const data = renderData(ctx, {
       user: user ? user.toJson() : null,
       shots: shots,
-      paging: {
-        name: '/my/bookmarks',
+      page: {
+        path: '/my/bookmarks',
         current: page,
-        max: Math.ceil(count / 10)
-      },
-      csrf: ctx.csrf,
-      service: settings.site.service
-    };
-  
+        max: max
+      }
+    });
+
+    data.page.name = data.i18n.bookmarks;
+
     await ctx.render('page-recent', data);
   });
 
@@ -949,8 +906,7 @@ module.exports = function setupRouter (router) {
       return;
     }
 
-    const page = 1;
-    const flags = await findUserFlags(user.id, user.id, 10, 10 * (page - 1));
+    const flags = await findUserFlags(user.id, user.id, 10, 0);
     const count = await countUserFlags(user.id);
 
     // extract shot data from flag data
@@ -961,20 +917,18 @@ module.exports = function setupRouter (router) {
     }
 
     // since shot data is flatten already, just use it
-    const data = {
-      meta: settings.site.meta,
-      i18n: settings.site.i18n[settings.site.meta.lang],
+    const data = renderData(ctx, {
       user: user ? user.toJson() : null,
       shots: shots,
-      paging: {
-        name: '/my/flags',
-        current: page,
+      page: {
+        path: '/my/flags',
+        current: 1,
         max: Math.ceil(count / 10)
-      },
-      csrf: ctx.csrf,
-      service: settings.site.service
-    };
-  
+      }
+    });
+
+    data.page.name = data.i18n.flags;
+
     await ctx.render('page-recent', data);
   });
 
@@ -991,13 +945,10 @@ module.exports = function setupRouter (router) {
     }
 
     const page = parseInt(ctx.request.params.page);
-    if (isNaN(page) || page < 2 || page != ctx.request.params.page) {
-      ctx.redirect('/my/flags');
-      return;
-    }
-
     const count = await countUserFlags(user.id);
-    if ((page - 1) * 10 > count) {
+    const max = Math.ceil(count / 10);
+
+    if (!isValidPageNumber(page, max)) {
       ctx.redirect('/my/flags');
       return;
     }
@@ -1010,20 +961,18 @@ module.exports = function setupRouter (router) {
       shots.push(bookFlatten.shot);
     }
 
-    const data = {
-      meta: settings.site.meta,
-      i18n: settings.site.i18n[settings.site.meta.lang],
+    const data = renderData(ctx, {
       user: user ? user.toJson() : null,
       shots: shots,
-      paging: {
-        name: '/my/flags',
+      page: {
+        path: '/my/flags',
         current: page,
-        max: Math.ceil(count / 10)
-      },
-      csrf: ctx.csrf,
-      service: settings.site.service
-    };
-  
+        max: max
+      }
+    });
+
+    data.page.name = data.i18n.flags;
+
     await ctx.render('page-recent', data);
   });
 
@@ -1039,13 +988,10 @@ module.exports = function setupRouter (router) {
       ctx.redirect('/');
       return;
     }
-  
-    const data = {
-      meta: settings.site.meta,
-      i18n: settings.site.i18n[settings.site.meta.lang],
-      csrf: ctx.csrf
-    };
-  
+
+    const data = renderData(ctx, {});
+    data.page.name = data.i18n.login;
+
     await ctx.render('page-login', data);
   });
 
@@ -1086,25 +1032,22 @@ module.exports = function setupRouter (router) {
     const text = romanize(search);
 
     await db.ready();
-    const page = 1;
     const user = await findCurrentUser(ctx);
     const id = user ? user.id : -1;
-    const shots = await searchShots(text, id, 10, 10 * (page - 1));
+    const shots = await searchShots(text, id, 10, 0);
 
-    const data = {
-      meta: settings.site.meta,
-      i18n: settings.site.i18n[settings.site.meta.lang],
+    const data = renderData(ctx, {
       user: user ? user.toJson() : null,
       shots: shots ? shots.toJson() : [],
-      paging: {
-        name: '/search/' + search,
-        current: page
-      },
       search: search,
-      csrf: ctx.csrf,
-      service: settings.site.service
-    };
-  
+      page: {
+        path: '/search/' + search,
+        current: 1
+      }
+    });
+
+    data.page.name = data.i18n.search;
+
     await ctx.render('page-search', data);
   });
 
@@ -1120,8 +1063,9 @@ module.exports = function setupRouter (router) {
     }
 
     const page = parseInt(ctx.request.params.page);
-    if (isNaN(page) || page < 2 || page != ctx.request.params.page) {
-      ctx.redirect('/search/' + encodeURIComponent(search));
+
+    if (!isValidPageNumber(page, 1000000)) {
+      ctx.redirect('/search/' + search);
       return;
     }
 
@@ -1132,20 +1076,18 @@ module.exports = function setupRouter (router) {
     const id = user ? user.id : -1;
     const shots = await searchShots(text, id, 10, 10 * (page - 1));
 
-    const data = {
-      meta: settings.site.meta,
-      i18n: settings.site.i18n[settings.site.meta.lang],
+    const data = renderData(ctx, {
       user: user ? user.toJson() : null,
       shots: shots ? shots.toJson() : [],
-      paging: {
-        name: '/search/' + search,
-        current: page
-      },
       search: search,
-      csrf: ctx.csrf,
-      service: settings.site.service
-    };
-  
+      page: {
+        path: '/search/' + search,
+        current: page
+      }
+    });
+
+    data.page.name = data.i18n.search;
+
     await ctx.render('page-search', data);
   });
 
@@ -1177,20 +1119,15 @@ module.exports = function setupRouter (router) {
     const id = user ? user.id : -1;
     const shots = await duplicateShots(text, id, 4, 0);
 
-    const data = {
-      meta: settings.site.meta,
-      i18n: settings.site.i18n[settings.site.meta.lang],
+    const data = renderData(ctx, {
       user: user ? user.toJson() : null,
       shots: shots ? shots.toJson() : [],
-      paging: {
-        name: '/duplicate/' + search
-      },
-      search: search,
-      csrf: ctx.csrf,
-      service: settings.site.service,
-      flash: flash
-    };
-  
+      flash: flash,
+      page: {
+        path: '/duplicate/' + search
+      }
+    });
+
     await ctx.render('page-index', data);
   });
 
@@ -1201,7 +1138,7 @@ module.exports = function setupRouter (router) {
     await db.ready();
     const user = await findCurrentUser(ctx);
 
-    // not login, go there
+    // not login
     if (!user) {
       ctx.redirect('/login');
       return;
@@ -1387,6 +1324,7 @@ module.exports = function setupRouter (router) {
         return;
       }
 
+      // generate images
       await sharp(shot.path).limitInputPixels(5120 * 2880).resize(1280, 720, {
         fit: 'outside'
       }).jpeg({
@@ -1514,7 +1452,7 @@ module.exports = function setupRouter (router) {
       localUser = await createUser(oauthResult, userProfile);
     } catch (err) {
       console.error(err);
-      ctx.flash('login-error', 'username alraedy taken');
+      ctx.flash('login-error', 'username alraedy taken or database error');
       ctx.redirect('/');
       return;
     }
@@ -1531,17 +1469,13 @@ module.exports = function setupRouter (router) {
     await db.ready();
     const user = await findCurrentUser(ctx);
 
-    // toJson flatten db result into plain object
-    const data = {
-      meta: settings.site.meta,
-      i18n: settings.site.i18n[settings.site.meta.lang],
+    const data = renderData(ctx, {
       user: user ? user.toJson() : null,
-      paging: {
-        name: '/guide/content'
-      },
-      csrf: ctx.csrf,
-    };
-  
+      page: {
+        path: '/guide/content'
+      }
+    });
+
     await ctx.render('page-guide', data);
   });
 
@@ -1549,19 +1483,18 @@ module.exports = function setupRouter (router) {
     await db.ready();
     const user = await findCurrentUser(ctx);
 
-    // toJson flatten db result into plain object
-    const data = {
-      meta: settings.site.meta,
-      i18n: settings.site.i18n[settings.site.meta.lang],
+    const data = renderData(ctx, {
       user: user ? user.toJson() : null,
-      paging: {
-        name: '/guide/usage'
-      },
-      csrf: ctx.csrf,
-    };
+      page: {
+        path: '/guide/usage'
+      }
+    });
   
     await ctx.render('page-guide', data);
   });
 
+  //
+  // done
+  //
   return router;
 }

@@ -1,7 +1,7 @@
 div.column.col-10.col-md-9.col-sm-8.col-xs-12
   if flash
     include view-flash.pug
-  if paging.name == "/index"
+  if page.path == "/index"
     include view-upload.pug
   div.columns
     each shot in shots
@@ -76,10 +76,10 @@ div.column.col-10.col-md-9.col-sm-8.col-xs-12
                 ) #{i18n.delete_icon} #{i18n.delete}
     else
       div.column.col-12.text-center
-        if paging.name == "/my"
+        if page.path == "/my"
           a.btn.btn-lg.btn-secondary(href="/") #{i18n.no_upload}
-        else if paging.name == "/my/bookmarks"
+        else if page.path == "/my/bookmarks"
           a.btn.btn-lg.btn-secondary(href="/") #{i18n.no_bookmarks}
-        else if paging.name == "/my/flags"
+        else if page.path == "/my/flags"
           a.btn.btn-lg.btn-secondary(href="/") #{i18n.no_flags}
 

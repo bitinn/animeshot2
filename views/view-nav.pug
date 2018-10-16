@@ -1,22 +1,22 @@
 div.column.col-2.col-md-3.col-sm-4.col-xs-12
   ul.nav
-    li.nav-item(class=(paging.name == "/recent") ? "active" : "")
+    li.nav-item(class=(page.path == "/recent") ? "active" : "")
       a(href="/recent") #{i18n.recent}
-    li.nav-item(class=(paging.name == "/top") ? "active" : "")
+    li.nav-item(class=(page.path == "/top") ? "active" : "")
       a(href="/top") #{i18n.top}
     if !user
-      li.nav-item(class=(paging.name == "/login") ? "active" : "")
+      li.nav-item(class=(page.path == "/login") ? "active" : "")
         a(href="/login") #{i18n.login}
     else
       if user.is_mod
-        li.nav-item(class=(paging.name == "/management") ? "active" : "")
+        li.nav-item(class=(page.path == "/management") ? "active" : "")
           a(href="/management") #{i18n.manage}
-      li.nav-item(class=(paging.name == "/my") ? "active" : "")
+      li.nav-item(class=(page.path == "/my") ? "active" : "")
         a(href="/my") #{i18n.shot_icon} #{i18n.my}
       ul.nav
-        li.nav-item(class=(paging.name == "/my/bookmarks") ? "active" : "")
+        li.nav-item(class=(page.path == "/my/bookmarks") ? "active" : "")
           a(href="/my/bookmarks") #{i18n.bookmark_icon} #{i18n.bookmarks}
-        li.nav-item(class=(paging.name == "/my/flags") ? "active" : "")
+        li.nav-item(class=(page.path == "/my/flags") ? "active" : "")
           a(href="/my/flags") #{i18n.flag_icon} #{i18n.flags}
         li.nav-item
           a(href="/logout") #{i18n.logout}

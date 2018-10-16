@@ -2,24 +2,36 @@ head
   meta(charset="UTF-8")
   meta(name="viewport" content="width=device-width, initial-scale=1.0")
   meta(name="referrer" content="same-origin")
-  title #{meta.title}
+  if page.name
+    title #{meta.title} / #{page.name}
+  else
+    title #{meta.title}
   link(rel="stylesheet" href="/css/spectre.min.css?" + meta.version)
   link(rel="stylesheet" href="/css/animeshot.css?" + meta.version)
   script(src=("/js/animeshot.js?" + meta.version) defer async)
   if shot
     meta(name="twitter:card" content="summary_large_image")
     meta(name="twitter:site" content="@" + meta.owner)
-    meta(name="twitter:title" content=meta.title)
-    meta(name="twitter:description" content=shot.text)
+    meta(name="twitter:title" content=shot.text)
+    meta(name="twitter:description" content=meta.title + " / " + meta.tagline)
     if !shot.legacy
-      meta(name="twitter:image" content=(meta.base_url + "/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".720p.jpg"))
+      meta(
+        name="twitter:image"
+        content=(meta.base_url + "/uploads/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".720p.jpg")
+      )
     else
-      meta(name="twitter:image" content=(meta.base_url + "/uploads/legacy/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".1200.jpg"))
-    meta(name="twitter:image:alt" content="shot image")
+      meta(
+        name="twitter:image"
+        content=(meta.base_url + "/uploads/legacy/" + shot.hash.substring(shot.hash.length - 2) + "/" + shot.hash + ".1200.jpg")
+      )
+    meta(name="twitter:image:alt" content="animeshot image")
   else
     meta(name="twitter:card" content="summary")
     meta(name="twitter:site" content="@" + meta.owner)
-    meta(name="twitter:title" content=meta.title)
+    if page.name
+      meta(name="twitter:title" content=meta.title + " / " + page.name)
+    else
+      meta(name="twitter:title" content=meta.title)
     meta(name="twitter:description" content=meta.tagline)
     meta(name="twitter:image" content=meta.base_url + meta.logo)
     meta(name="twitter:image:alt" content="site logo")

@@ -3,18 +3,18 @@ div.column.column.col-10.col-md-9.col-sm-8.col-xs-12.text-center
   div.d-inline-block.text-left
     ul.pagination
       //- previous page
-      if paging.current == 1
+      if page.current == 1
         li.page-item.disabled
           span #{i18n.previous}
       else
         li.page-item
-          a(href=paging.name + "/" + (paging.current - 1)) #{i18n.previous}
+          a(href=page.path + "/" + (page.current - 1)) #{i18n.previous}
       //- no page number
-      if paging.current != 1
+      if page.current != 1
         li.page-item
           span ...
       li.page-item.active
-        a(href=paging.name + "/" + paging.current) #{paging.current}
+        a(href=page.path + "/" + page.current) #{page.current}
       if shots.length != 0
         li.page-item
           span ...
@@ -24,4 +24,4 @@ div.column.column.col-10.col-md-9.col-sm-8.col-xs-12.text-center
           span #{i18n.next}
       else
         li.page-item
-          a(href=paging.name + "/" + (paging.current + 1)) #{i18n.next}
+          a(href=page.path + "/" + (page.current + 1)) #{i18n.next}

@@ -3,54 +3,54 @@ div.column.column.col-10.col-md-9.col-sm-8.col-xs-12.text-center
   div.d-inline-block.text-left
     ul.pagination
       //- previous page and first page
-      if paging.current == 1
+      if page.current == 1
         li.page-item.disabled
           span #{i18n.previous}
         li.page-item.active
-          a(href=paging.name + "/1") 1
+          a(href=page.path + "/1") 1
       else
         li.page-item
-          a(href=paging.name + "/" + (paging.current - 1)) #{i18n.previous}
+          a(href=page.path + "/" + (page.current - 1)) #{i18n.previous}
         li.page-item
-          a(href=paging.name + "/1") 1
+          a(href=page.path + "/1") 1
       //- special cases
-      if paging.max >= 3 && paging.max <= 5
-        li.page-item(class=(paging.current == 2) ? "active" : "")
-          a(href=paging.name + "/2") 2
-      if paging.max >= 4 && paging.max <= 5
-        li.page-item(class=(paging.current == 3) ? "active" : "")
-          a(href=paging.name + "/3") 3
-      if paging.max == 5
-        li.page-item(class=(paging.current == 4) ? "active" : "")
-          a(href=paging.name + "/4") 4
+      if page.max >= 3 && page.max <= 5
+        li.page-item(class=(page.current == 2) ? "active" : "")
+          a(href=page.path + "/2") 2
+      if page.max >= 4 && page.max <= 5
+        li.page-item(class=(page.current == 3) ? "active" : "")
+          a(href=page.path + "/3") 3
+      if page.max == 5
+        li.page-item(class=(page.current == 4) ? "active" : "")
+          a(href=page.path + "/4") 4
       //- common cases
-      if paging.max >= 6
-        if paging.current >= 4
+      if page.max >= 6
+        if page.current >= 4
           li.page-item
             span ...
-        if paging.current >= 3 && paging.current <= paging.max
+        if page.current >= 3 && page.current <= page.max
           li.page-item
-            a(href=paging.name + "/" + (paging.current - 1)) #{paging.current - 1}
-        if paging.current >= 2 && paging.current <= paging.max - 1
+            a(href=page.path + "/" + (page.current - 1)) #{page.current - 1}
+        if page.current >= 2 && page.current <= page.max - 1
           li.page-item.active
-            a(href=paging.name + "/" + paging.current) #{paging.current}
-        if paging.current >= 1 && paging.current <= paging.max - 2
+            a(href=page.path + "/" + page.current) #{page.current}
+        if page.current >= 1 && page.current <= page.max - 2
           li.page-item
-            a(href=paging.name + "/" + (paging.current + 1)) #{paging.current + 1}
-        if paging.current <= paging.max - 3
+            a(href=page.path + "/" + (page.current + 1)) #{page.current + 1}
+        if page.current <= page.max - 3
           li.page-item
             span ...
       //- last page and next page
-      if paging.max <= 1
+      if page.max <= 1
         li.page-item.disabled
           span #{i18n.next}
-      else if paging.current == paging.max
+      else if page.current == page.max
         li.page-item.active
-          a(href=paging.name + "/" + paging.max) #{paging.max}
+          a(href=page.path + "/" + page.max) #{page.max}
         li.page-item.disabled
           span #{i18n.next}
       else
         li.page-item
-            a(href=paging.name + "/" + paging.max) #{paging.max}
+            a(href=page.path + "/" + page.max) #{page.max}
         li.page-item
-          a(href=paging.name + "/" + (paging.current + 1)) #{i18n.next}
+          a(href=page.path + "/" + (page.current + 1)) #{i18n.next}
