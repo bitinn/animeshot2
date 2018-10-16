@@ -1,6 +1,6 @@
 {
   "name": "animeshot2",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "An open and searchable image repository in Node.js",
   "main": "index.js",
   "scripts": {
