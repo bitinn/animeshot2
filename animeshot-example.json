@@ -7,7 +7,7 @@
       "logo": "/images/logo.jpg",
       "lang": "en",
       "base_url": "https://your.site.domain",
-      "version": "r1"
+      "version": "r20181016"
     },
     "service": {
       "source": "https://whatanime.ga/?url=",
