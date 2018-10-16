@@ -48,6 +48,9 @@
     }
   },
   "bot": {
-    "telegram": "...apply for a telegram bot..."
+    "telegram": "...apply for a telegram bot...",
+    "result_count": 10,
+    "cache_time": 0,
+    "is_personal": false
   }
 }

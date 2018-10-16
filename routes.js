@@ -13,7 +13,9 @@ const cuid = require('cuid');
 const createDirectory = require('make-dir');
 const delFiles = require('del');
 
-const settings = require(__dirname + '/animeshot.json');
+const defaultSettings = require(__dirname + '/animeshot-example.json');
+const customSettings = require(__dirname + '/animeshot.json');
+const settings = Object.assign({}, defaultSettings, customSettings);
 const i18n = require(__dirname + '/i18n.json');
 settings.site.i18n = i18n;
 

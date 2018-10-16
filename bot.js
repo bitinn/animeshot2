@@ -6,7 +6,9 @@ const openrecord = require('openrecord/store/sqlite3');
 const pinyin = require('pinyin');
 const hepburn = require('hepburn');
 
-const settings = require(__dirname + '/animeshot.json');
+const defaultSettings = require(__dirname + '/animeshot-example.json');
+const customSettings = require(__dirname + '/animeshot.json');
+const settings = Object.assign({}, defaultSettings, customSettings);
 const i18n = require(__dirname + '/i18n.json');
 settings.site.i18n = i18n;
 
@@ -88,7 +90,7 @@ bot.on('inline_query', async ({ inlineQuery, answerInlineQuery }) => {
   const text = romanize(search);
 
   await db.ready();
-  const shots = await searchShots(text, 20, offset);
+  const shots = await searchShots(text, settings.bot.result_count, offset);
 
   if (!shots) {
     return answerInlineQuery([], { next_offset: '' });
@@ -117,7 +119,11 @@ bot.on('inline_query', async ({ inlineQuery, answerInlineQuery }) => {
     return output;
   });
 
-  return answerInlineQuery(results, { next_offset: offset + 20 });
+  return answerInlineQuery(results, {
+    next_offset: offset + settings.bot.result_count,
+    is_personal: settings.bot.is_personal,
+    cache_time: settings.bot.cache_time
+  });
 });
 
 bot.startPolling();

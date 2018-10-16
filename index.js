@@ -21,7 +21,9 @@ const koaFlash = require('koa-better-flash');
 const grant = require('grant-koa');
 
 const setupRouter = require(__dirname + '/routes');
-const settings = require(__dirname + '/animeshot.json');
+const defaultSettings = require(__dirname + '/animeshot-example.json');
+const customSettings = require(__dirname + '/animeshot.json');
+const settings = Object.assign({}, defaultSettings, customSettings);
 const i18n = require(__dirname + '/i18n.json');
 settings.site.i18n = i18n;
 
