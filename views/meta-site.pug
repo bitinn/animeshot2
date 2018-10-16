@@ -5,7 +5,7 @@ head
   if page.name
     title #{meta.title} / #{page.name}
   else
-    title #{meta.title}
+    title #{meta.title} / #{meta.tagline}
   link(rel="stylesheet" href="/css/spectre.min.css?" + meta.version)
   link(rel="stylesheet" href="/css/animeshot.css?" + meta.version)
   script(src=("/js/animeshot.js?" + meta.version) defer async)

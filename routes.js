@@ -445,9 +445,6 @@ module.exports = function setupRouter (router) {
       }
     });
 
-    // generate route specific page title
-    data.page.name = data.meta.tagline;
-
     await ctx.render('page-index', data);
   });
 
@@ -475,6 +472,7 @@ module.exports = function setupRouter (router) {
       }
     });
 
+    // generate route specific page title
     data.page.name = data.shot.text;
 
     await ctx.render('page-shot', data);
