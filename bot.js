@@ -115,7 +115,13 @@ bot.on('inline_query', async ({ inlineQuery, answerInlineQuery }) => {
   // query data
   const offset = parseInt(inlineQuery.offset) || 0;
   const search = inlineQuery.query;
-  const tid = inlineQuery.from.id;
+
+  let tid;
+  if (!inlineQuery.from || !inlineQuery.from.id) {
+    tid = -1;
+  } else {
+    tid = parseInt(inlineQuery.from.id);
+  }
 
   await db.ready();
   let shots;
@@ -123,18 +129,22 @@ bot.on('inline_query', async ({ inlineQuery, answerInlineQuery }) => {
   if (search == 'my') {
     // load user upload
     const user = await findUserByTelegramId(tid);
-    shots = await findUserShots(user.id, settings.bot.result_count, offset);
+    if (user && user.id) {
+      shots = await findUserShots(user.id, settings.bot.result_count, offset);
+    }
 
   } else if (search == 'bm') {
     // load user bookmark
     const user = await findUserByTelegramId(tid);
-    const books = await findUserBookmarks(user.id, settings.bot.result_count, offset);
+    if (user && user.id) {
+      const books = await findUserBookmarks(user.id, settings.bot.result_count, offset);
 
-    // extract shot data from bookmark data
-    shots = [];
-    for (let i = 0; i < books.length; i++) {
-      const bookFlatten = books[i].toJson();
-      shots.push(bookFlatten.shot);
+      // extract shot data from bookmark data
+      shots = [];
+      for (let i = 0; i < books.length; i++) {
+        const bookFlatten = books[i].toJson();
+        shots.push(bookFlatten.shot);
+      }
     }
 
   } else {

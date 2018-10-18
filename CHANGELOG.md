@@ -1,6 +1,10 @@
 
 # changelog
 
+## v0.10.2
+
+- fix: bot parameter handling
+
 ## v0.10.1
 
 - fix: bot command
