@@ -40,6 +40,7 @@ An open, portable, searchable image repository with twitter card and telegram bo
 3. Edit the config **(see guide below)**
 4. `npm run bot`
 5. Now you should be able to type `@yourbot some-text` to search the animeshot database
+6. You can also register your domain with BotFather, and use the optional Telegram web login
 
 ## Other Commands
 
@@ -64,7 +65,7 @@ This is the full config with explanation, but since it's just a JSON file, you s
       "logo": "/images/logo.jpg", // site logo for twitter card
       "lang": "en", // language hint and translations, see i18n.json
       "base_url": "https://your.site.domain", // site domain name
-      "version": "r1" // only used in static asset cache bursting
+      "version": "r20181016" // only used in static asset cache bursting
     },
     "service": {
       "source": "https://whatanime.ga/?url=", // finding out image origin
@@ -106,6 +107,10 @@ This is the full config with explanation, but since it's just a JSON file, you s
   },
   "bot": {
     "telegram": "...apply for a telegram bot..." // https://telegram.me/BotFather
+    "result_count": 10, // how many result to return per search
+    "cache_time": 0, // how long to cache response (used by telegram)
+    "is_personal": false, // whether to cache response by user (used by telegram)
+    "callback": "/bot/callback" // callback route for telegram login
   }
 }
 ```
