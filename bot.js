@@ -128,7 +128,14 @@ bot.on('inline_query', async ({ inlineQuery, answerInlineQuery }) => {
   } else if (search == 'bm') {
     // load user bookmark
     const user = await findUserByTelegramId(tid);
-    shots = await findUserBookmarks(user.id, settings.bot.result_count, offset);
+    const books = await findUserBookmarks(user.id, settings.bot.result_count, offset);
+
+    // extract shot data from bookmark data
+    shots = [];
+    for (let i = 0; i < books.length; i++) {
+      const bookFlatten = books[i].toJson();
+      shots.push(bookFlatten.shot);
+    }
 
   } else {
     // search image by text
@@ -146,7 +153,13 @@ bot.on('inline_query', async ({ inlineQuery, answerInlineQuery }) => {
   }
 
   // process data
-  const shotArray = shots.toJson();
+  let shotArray;
+  if (typeof shots.toJson == 'function') {
+    shotArray = shots.toJson();
+  } else {
+    shotArray = shots;
+  }
+
   const results = shotArray.map((shot) => {
     let output = {
       type: 'photo',

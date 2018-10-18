@@ -1,6 +1,10 @@
 
 # changelog
 
+## v0.10.1
+
+- fix: bot command
+
 ## v0.10.0
 
 - new: telegram login support
