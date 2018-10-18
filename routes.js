@@ -12,6 +12,7 @@ const sharp = require('sharp');
 const cuid = require('cuid');
 const createDirectory = require('make-dir');
 const delFiles = require('del');
+const crypto = require('crypto');
 
 const defaultSettings = require(__dirname + '/animeshot-example.json');
 const customSettings = require(__dirname + '/animeshot.json');
@@ -52,7 +53,6 @@ db.Model('flags', function () {
   this.belongsTo('shot', { model: 'shots', from: 'shot_id', to: 'id' });
   this.belongsTo('bookmark', { through: 'shot', relation: 'bookmark' });
   this.belongsTo('flag', { through: 'shot', relation: 'flag' });
-  this.belongsTo('shot_user', { through: 'shot', relation: 'user' });
 });
 
 // define oauth sign-in
@@ -975,6 +975,49 @@ module.exports = function setupRouter (router) {
   });
 
   //
+  // settings page
+  //
+  router.get('/my/settings', async (ctx) => {
+    await db.ready();
+    const user = await findCurrentUser(ctx);
+
+    if (!user) {
+      ctx.redirect('/');
+      return;
+    }
+
+    const botSuccess = ctx.flash('bot-success');
+    const botError = ctx.flash('bot-error');
+
+    // flash message handling
+    let flash = null;
+    if (botSuccess.length > 0) {
+      flash = {
+        type: 'bot-success',
+        message: botSuccess[0]
+      }
+    } else if (botError.length > 0) {
+      flash = {
+        type: 'bot-error',
+        message: botError[0]
+      }
+    }
+
+    const data = renderData(ctx, {
+      user: user ? user.toJson() : null,
+      flash: flash,
+      page: {
+        path: '/my/settings',
+        telegram_login_callback: settings.bot.callback
+      }
+    });
+
+    data.page.name = data.i18n.settings;
+
+    await ctx.render('page-settings', data);
+  });
+
+  //
   // login page
   //
   router.get('/login', async (ctx) => {
@@ -1458,6 +1501,69 @@ module.exports = function setupRouter (router) {
     ctx.session = { user: { id: localUser.id } };
     ctx.flash('login-success', localUser.name);
     ctx.redirect('/');
+  });
+
+  //
+  // telegram login callback
+  //
+  router.get(settings.bot.callback, async (ctx) => {
+    await db.ready();
+    const user = await findCurrentUser(ctx);
+
+    // only handle login user
+    if (!user) {
+      ctx.redirect('/');
+      return;
+    }
+
+    const result = ctx.request.query;
+
+    // must contain valid data
+    if (!result || !result.id || !result.hash || !result.auth_date) {
+      ctx.flash('bot-error', 'callback parameter missing');
+      ctx.redirect('/my/settings');
+      return;
+    }
+
+    // validate result
+    const secret = crypto.createHash('sha256').update(settings.bot.telegram).digest();
+    const hash = result.hash;
+
+    const resultString = Object.keys(result)
+      .filter(key => key !== 'hash')
+      .sort()
+      .map(k => `${k}=${result[k]}`)
+      .join('\n');
+    const hmac = crypto.createHmac('sha256', secret).update(resultString).digest('hex');
+
+    if (hmac != hash) {
+      ctx.flash('bot-error', 'hash mismatch');
+      ctx.redirect('/my/settings');
+      return;
+    }
+
+    // validate timestamp
+    const timestamp = parseInt(result.auth_date);
+    if (timestamp * 1000 < Date.now() - 5 * 60 * 1000) {
+      ctx.flash('bot-error', 'auth timeout');
+      ctx.redirect('/my/settings');
+      return;
+    }
+
+    // update user
+    try {
+      user.telegram_id = parseInt(result.id);
+      user.telegram_username = result.username;
+      await user.save();
+    } catch (err) {
+      console.error(err);
+      ctx.flash('bot-error', 'telegram data missing or database issue');
+      ctx.redirect('/my/settings');
+      return;
+    }
+
+    ctx.flash('bot-success', result.username);
+    ctx.redirect('/my/settings');
   });
 
   //

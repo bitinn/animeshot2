@@ -18,5 +18,7 @@ div.column.col-2.col-md-3.col-sm-4.col-xs-12
           a(href="/my/bookmarks") #{i18n.bookmark_icon} #{i18n.bookmarks}
         li.nav-item(class=(page.path == "/my/flags") ? "active" : "")
           a(href="/my/flags") #{i18n.flag_icon} #{i18n.flags}
+        li.nav-item(class=(page.path == "/my/settings") ? "active" : "")
+          a(href="/my/settings") #{i18n.settings_icon} #{i18n.settings}
         li.nav-item
           a(href="/logout") #{i18n.logout}

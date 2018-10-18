@@ -12,3 +12,9 @@ div.columns
   if flash.type == "upload-error"
     div.div.column.col-12.p-2.mb-2.flash-error
       p.h5.m-2.text-center Upload Error: #{flash.message}?
+  if flash.type == "bot-success"
+    div.div.column.col-12.p-2.mb-2.flash-success
+      p.h5.m-2.text-center Connected to: @#{flash.message}!
+  if flash.type == "bot-error"
+    div.div.column.col-12.p-2.mb-2.flash-error
+      p.h5.m-2.text-center Connect Error: #{flash.message}?

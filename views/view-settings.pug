@@ -1,0 +1,15 @@
+div.column.col-10.col-md-9.col-sm-8.col-xs-12
+  if flash
+    include view-flash.pug
+  h5.h5 Telegram Bot 绑定
+  ol
+    li 我们只会记录你的 Telegram 用户 ID 与 用户名。
+    li 它允许我们在 @animeshot2bot 上提供便利服务。
+      ul
+        li 输入 my 可获得你自己上传的图片列表
+        li 输入 bm 可获得你收藏的图片列表
+  if user.telegram_id
+    p 你已绑定 #{user.telegram_id}:#{user.telegram_username}
+    p 再次绑定会覆盖之前的绑定。
+  script(async src="https://telegram.org/js/telegram-widget.js?4" data-telegram-login="animeshot2bot" data-size="medium" data-auth-url=meta.base_url + page.telegram_login_callback)
+

@@ -27,10 +27,16 @@ const db = new openrecord({
 
 db.Model('users', function () {
   this.hasMany('shot', { model: 'shots', from: 'id', to: 'user_id' });
+  this.hasMany('bookmark', { model: 'bookmarks', from: 'id', to: 'user_id' });
 });
 
 db.Model('shots', function () {
   this.belongsTo('user', { model: 'users', from: 'user_id', to: 'id' });
+});
+
+db.Model('bookmarks', function () {
+  this.belongsTo('user', { model: 'users', from: 'user_id', to: 'id' });
+  this.belongsTo('shot', { model: 'shots', from: 'shot_id', to: 'id' });
 });
 
 // helper function to romanize search input
@@ -82,20 +88,64 @@ async function searchShots (text, limit = 0, offset = 0) {
   return shots;
 }
 
+async function findUserShots (user_id, limit = 0, offset = 0) {
+  const shotModel = db.Model('shots');
+  const shots = await shotModel.where({ user_id: user_id }).order('created', true).limit(limit, offset);
+
+  return shots;
+}
+
+async function findUserBookmarks (user_id, limit = 0, offset = 0) {
+  const bookModel = db.Model('bookmarks');
+  const books = await bookModel.where({ user_id: user_id }).order('created', true).limit(limit, offset).include('shot');
+
+  return books;
+}
+
+async function findUserByTelegramId (id) {
+  const userModel = db.Model('users');
+  const user = await userModel.where({ telegram_id: id }).first();
+
+  return user;
+}
+
 // bot logic
 
 bot.on('inline_query', async ({ inlineQuery, answerInlineQuery }) => {
+  // query data
   const offset = parseInt(inlineQuery.offset) || 0;
   const search = inlineQuery.query;
-  const text = romanize(search);
+  const tid = inlineQuery.from.id;
 
   await db.ready();
-  const shots = await searchShots(text, settings.bot.result_count, offset);
+  let shots;
 
-  if (!shots) {
-    return answerInlineQuery([], { next_offset: '' });
+  if (search == 'my') {
+    // load user upload
+    const user = await findUserByTelegramId(tid);
+    shots = await findUserShots(user.id, settings.bot.result_count, offset);
+
+  } else if (search == 'bm') {
+    // load user bookmark
+    const user = await findUserByTelegramId(tid);
+    shots = await findUserBookmarks(user.id, settings.bot.result_count, offset);
+
+  } else {
+    // search image by text
+    const text = romanize(search);
+    shots = await searchShots(text, settings.bot.result_count, offset);
   }
 
+  // no result
+  if (!shots || shots.length == 0) {
+    return answerInlineQuery([], {
+      next_offset: '',
+      is_personal: settings.bot.is_personal,
+      cache_time: settings.bot.cache_time
+    });
+  }
+
+  // process data
   const shotArray = shots.toJson();
   const results = shotArray.map((shot) => {
     let output = {
@@ -119,6 +169,7 @@ bot.on('inline_query', async ({ inlineQuery, answerInlineQuery }) => {
     return output;
   });
 
+  // result
   return answerInlineQuery(results, {
     next_offset: offset + settings.bot.result_count,
     is_personal: settings.bot.is_personal,

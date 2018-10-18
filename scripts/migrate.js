@@ -27,6 +27,7 @@ async function migrateDatabase () {
       require('../migrations/database_migration_r8'),
       require('../migrations/database_migration_r9'),
       require('../migrations/database_migration_r10'),
+      require('../migrations/database_migration_r11'),
     ]
   });
 
