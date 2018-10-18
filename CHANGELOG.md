@@ -1,6 +1,10 @@
 
 # changelog
 
+## v0.10.0
+
+- new: telegram login support
+
 ## v0.9.1
 
 - enhance: page title and twitter card
