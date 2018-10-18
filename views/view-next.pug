@@ -6,6 +6,9 @@ div.column.column.col-10.col-md-9.col-sm-8.col-xs-12.text-center
       if page.current == 1
         li.page-item.disabled
           span #{i18n.previous}
+      else if page.current == 2
+        li.page-item
+          a(href=page.path) #{i18n.previous}
       else
         li.page-item
           a(href=page.path + "/" + (page.current - 1)) #{i18n.previous}
@@ -13,13 +16,17 @@ div.column.column.col-10.col-md-9.col-sm-8.col-xs-12.text-center
       if page.current != 1
         li.page-item
           span ...
-      li.page-item.active
-        a(href=page.path + "/" + page.current) #{page.current}
-      if shots.length != 0
+      if page.current == 1
+        li.page-item.active
+          a(href=page.path) #{page.current}
+      else
+        li.page-item.active
+          a(href=page.path + "/" + page.current) #{page.current}
+      if shots.length == 10
         li.page-item
           span ...
       //- next page
-      if shots.length == 0
+      if shots.length < 10
         li.page-item.disabled
           span #{i18n.next}
       else

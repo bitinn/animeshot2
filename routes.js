@@ -1106,7 +1106,7 @@ module.exports = function setupRouter (router) {
     const page = parseInt(ctx.request.params.page);
 
     if (!isValidPageNumber(page, 1000000)) {
-      ctx.redirect('/search/' + search);
+      ctx.redirect('/search/' + encodeURIComponent(search));
       return;
     }
 
