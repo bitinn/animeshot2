@@ -1,3 +1,7 @@
+* {
+  transition: none !important;
+}
+
 .btn-secondary, .btn-secondary:visited {
   border-color: #50596c;
   color: #50596c;
