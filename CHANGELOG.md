@@ -4,6 +4,7 @@
 ## v0.10.3
 
 - enhance: readme on oauth handling
+- fix: search paging issue
 
 ## v0.10.2
 
