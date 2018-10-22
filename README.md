@@ -1,6 +1,8 @@
 
 # animeshot2
 
+[![release badge](https://img.shields.io/github/release/bitinn/animeshot2.svg?style=flat-square)](https://github.com/bitinn/animeshot2/releases)
+
 An open, portable, searchable image repository with twitter card and telegram bot integration.
 
 (using nodejs + sqlite)
@@ -132,7 +134,7 @@ When you are creating a GitHub or Twitter App for OAuth login, remember to fill 
 - `https://your.domain/connect/github/callback`
 - `https://your.domain/connect/twitter/callback`
 
-As you can see this is **not** the oauth callback route defined in your site config, and the redirect actually handled internally by [grant](https://github.com/simov/grant).
+This is **not** the oauth callback route defined in your site config, and the redirect is actually handled internally by [grant](https://github.com/simov/grant).
 
 ## HTTPS Certificate
 
