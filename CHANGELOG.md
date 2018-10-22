@@ -1,6 +1,10 @@
 
 # changelog
 
+## v0.10.3
+
+- enhance: readme on oauth handling
+
 ## v0.10.2
 
 - fix: bot parameter handling

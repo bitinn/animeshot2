@@ -10,7 +10,7 @@
       "version": "r20181016"
     },
     "service": {
-      "source": "https://whatanime.ga/?url=",
+      "source": "https://trace.moe/?url=",
       "twitter": "https://twitter.com/intent/tweet?url="
     },
     "server": {

@@ -15,10 +15,12 @@ An open, portable, searchable image repository with twitter card and telegram bo
 
 (v2 however isn't compatible with v1, due to image quality difference and database backend change)
 
-## Usage
+## First Time Setup
 
 1. Have [nodejs](https://nodejs.org/en/download/current/) installed.
 2. Download [latest release](https://github.com/bitinn/animeshot2/releases)
+  - Alternatively, `git clone https://github.com/bitinn/animeshot2`
+  - Then `git checkout tags/<version>`
 3. Unzip and `cd` into your folder
 4. Run these commands in order:
   - `npm install`
@@ -32,6 +34,14 @@ An open, portable, searchable image repository with twitter card and telegram bo
 8. To actually login and upload images: you need to create a [GitHub](https://developer.github.com/apps/building-oauth-apps/creating-an-oauth-app/) or [Twitter](https://developer.twitter.com/) app for OAuth authentication. We recommend starting with GitHub as it's faster.
 
 (we might add a local password login in future, but for now, you need an OAuth provider)
+
+## Updating to Latest
+
+1. Download [latest release](https://github.com/bitinn/animeshot2/releases), and replace all files
+  - If you use git repo: `git pull` then `git checkout tags/<version>`
+2. `npm install`
+3. `npm run db:migrate`
+4. Your site is now up-to-date.
 
 ## Telegram Bot
 
@@ -114,6 +124,15 @@ This is the full config with explanation, but since it's just a JSON file, you s
   }
 }
 ```
+
+## OAuth Callback
+
+When you are creating a GitHub or Twitter App for OAuth login, remember to fill in the callback or redirect url as following:
+
+- `https://your.domain/connect/github/callback`
+- `https://your.domain/connect/twitter/callback`
+
+As you can see this is **not** the oauth callback route defined in your site config, and the redirect actually handled internally by [grant](https://github.com/simov/grant).
 
 ## HTTPS Certificate
 
