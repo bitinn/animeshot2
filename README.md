@@ -56,7 +56,8 @@ An open, portable, searchable image repository with twitter card and telegram bo
 
 ## Other Commands
 
-- `npm run db:mod -- username` will prompt `username` into moderator
+- `npm run db:mod -- username` will toggle `username` moderator capability
+- `npm run db:upload -- username` will toggle `username` upload capability
 - `npm run db:import -- v1.json` will import json data extracted from v1 animeshot database (`mongodump` then `bsondump`), and import image data from `/public/legacy/`.
 - `npm run db:seed` will seed database with some test data
 - `npm run db:reset` clean up the database
