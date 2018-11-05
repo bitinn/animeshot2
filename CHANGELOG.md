@@ -1,6 +1,10 @@
 
 # changelog
 
+## v0.11.0
+
+- new: add user upload capability
+
 ## v0.10.3
 
 - enhance: readme on oauth handling

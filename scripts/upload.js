@@ -1,19 +1,19 @@
 
-// toggle user moderation capability
+// toggle user upload capability
 
 const prompt = require('promptly');
 const openrecord = require('openrecord/store/sqlite3');
 
-async function toggleMod () {
-  const answer = await prompt.confirm('This will TOGGLE MOD FLAG for the username specified, PROCEED? (y/n)');
+async function toggleUpload () {
+  const answer = await prompt.confirm('This will TOGGLE UPLOAD FLAG for the username specified, PROCEED? (y/n)');
 
   if (!answer) {
-    console.log('toggle mod aborted');
+    console.log('toggle upload aborted');
     return;
   }
 
   if (process.argv.length != 3) {
-    console.log('unsupported parameter, run it like this: npm run db:mod -- username');
+    console.log('unsupported parameter, run it like this: npm run db:upload -- username');
     return;
   }
 
@@ -26,7 +26,7 @@ async function toggleMod () {
 
   await db.ready();
 
-  // toggle a user's mod flag
+  // toggle a user's upload flag
   const userModel = db.Model('users');
   const user = await userModel.where({ username: username }).first();
 
@@ -35,13 +35,13 @@ async function toggleMod () {
     return;
   }
 
-  user.is_mod = !user.is_mod;
+  user.can_upload = !user.can_upload;
   await user.save();
 
-  console.log('toggle mod done: ' + username + (user.is_mod ? ' is now a mod' : ' is no longer a mod'));
+  console.log('toggle upload flag done: ' + username + (user.can_upload ? ' can now upload new shots' : ' can no longer upload new shots'));
   db.close();
 }
 
-toggleMod().catch((err) => {
+toggleUpload().catch((err) => {
   console.log(err);
 });

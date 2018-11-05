@@ -12,7 +12,8 @@
     "db:seed": "node ./scripts/seed.js",
     "db:drop": "node ./scripts/drop.js",
     "db:mod": "node ./scripts/mod.js",
-    "db:import": "node ./scripts/import.js"
+    "db:import": "node ./scripts/import.js",
+    "db:upload": "node ./scripts/upload.js"
   },
   "repository": {
     "type": "git",

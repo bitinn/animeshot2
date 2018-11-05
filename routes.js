@@ -1325,6 +1325,12 @@ module.exports = function setupRouter (router) {
       return;
     }
 
+    if (!user.can_upload) {
+      ctx.flash('upload-error', 'upload capability has been disabled for this account');
+      ctx.redirect('/');
+      return;
+    }
+
     const shot = ctx.request.files.shot;
     const text = ctx.request.body.text;
 
