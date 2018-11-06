@@ -23,14 +23,22 @@ div.column.col-10.col-md-9.col-sm-8.col-xs-12
               p #{shot.text}
             if shot.user && shot.user.username
               div.chip
-                div.avatar.avatar-sm.bg-primary(data-initial=shot.user.name.charAt(0).toUpperCase())
+                div.avatar.avatar-sm.bg-primary(data-initial=(shot.user.name ? shot.user.name.charAt(0).toUpperCase() : ""))
                   a(href="/user/" + shot.user.username)
                     if shot.user.twitter_avatar
                       img(src=shot.user.twitter_avatar alt="avatar")
                     else if shot.user.github_avatar
                       img(src=shot.user.github_avatar alt="avatar")
                 span
-                  a.text-dark(href="/user/" + shot.user.username) #{shot.user.name}
+                  a.text-dark(href="/user/" + shot.user.username)
+                    if shot.user.name
+                      | #{shot.user.name}
+                    else if shot.user.github_id
+                      | Github #{shot.user.github_id}
+                    else if shot.user.twitter_id
+                      | Twitter #{shot.user.twitter_id}
+                    else
+                      | Unknown User
           div.card-footer
             form(method="post" enctype="multipart/form-data")
               input(type="hidden", name='_csrf', value=csrf)
