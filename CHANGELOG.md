@@ -1,6 +1,10 @@
 
 # changelog
 
+## v0.11.2
+
+- enhance: better username guessing at first login
+
 ## v0.11.1
 
 - fix: template issue with empty username

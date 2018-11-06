@@ -358,11 +358,17 @@ async function findOAuthUser (oauthResult, userProfile) {
 async function createUser (oauthResult, userProfile) {
   let newUser;
   const userModel = db.Model('users');
+  // better guess at username, until we allow user to modify it
+  const displayName = 
+    userProfile.name ? userProfile.name :
+      (userProfile.login ? userProfile.login :
+        (userProfile.screen_name ? userProfile.screen_name : "Unknown User")
+      );
 
   if (oauthResult.provider == 'github') {
     newUser = {
       username: cuid(),
-      name: userProfile.name,
+      name: displayName,
       github_id: userProfile.id,
       github_avatar: userProfile.avatar_url,
       github_username: userProfile.login,
@@ -372,7 +378,7 @@ async function createUser (oauthResult, userProfile) {
   } else if (oauthResult.provider == 'twitter') {
     newUser = {
       username: cuid(),
-      name: userProfile.name,
+      name: displayName,
       twitter_id: userProfile.id,
       twitter_avatar: userProfile.profile_image_url_https,
       twitter_username: userProfile.screen_name,
