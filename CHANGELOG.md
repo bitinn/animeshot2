@@ -1,6 +1,10 @@
 
 # changelog
 
+## v0.11.3
+
+- enhance: nodemon dependency, due to underlying `event-stream` security issue
+
 ## v0.11.2
 
 - enhance: better username guessing at first login
