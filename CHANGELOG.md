@@ -1,6 +1,10 @@
 
 # changelog
 
+## v0.11.5
+
+- fix: update `openrecord` version to fix another vulnerability report (`animeshot2` isn't affected as the issue only affects MSSQL).
+
 ## v0.11.4
 
 - fix: dependencies update to address some upstream vulnerabilities
