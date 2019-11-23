@@ -1,6 +1,10 @@
 
 # changelog
 
+## v0.11.4
+
+- fix: dependencies update to address some upstream vulnerabilities
+
 ## v0.11.3
 
 - enhance: nodemon dependency, due to underlying `event-stream` security issue
