@@ -55,7 +55,7 @@
     "sharp": "^0.20.8",
     "sqlite3": "^4.1.0",
     "telegraf": "^3.33.3",
-    "validator": "^10.11.0"
+    "validator": "^13.7.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.20"
