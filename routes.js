@@ -1378,26 +1378,26 @@ module.exports = function setupRouter (router) {
       }
 
       // generate images
-      await sharp(shot.path).limitInputPixels(5120 * 2880).resize(1280, 720, {
-        fit: 'outside'
+      await sharp(shot.path, { limitInputPixels: 5120 * 2880 }).resize(1280, 720, {
+        fit: 'cover'
       }).jpeg({
         quality: 95
       }).toFile(__dirname + '/public/uploads/' + folder + '/' + hash + '.720p.jpg');
 
-      await sharp(shot.path).limitInputPixels(5120 * 2880).resize(1920, 1080, {
-        fit: 'outside'
+      await sharp(shot.path, { limitInputPixels: 5120 * 2880 }).resize(1920, 1080, {
+        fit: 'cover'
       }).jpeg({
         quality: 95
       }).toFile(__dirname + '/public/uploads/' + folder + '/' + hash + '.1080p.jpg');
 
-      await sharp(shot.path).limitInputPixels(5120 * 2880).resize(2560, 1440, {
-        fit: 'outside'
+      await sharp(shot.path, { limitInputPixels: 5120 * 2880 }).resize(2560, 1440, {
+        fit: 'cover'
       }).jpeg({
         quality: 95
       }).toFile(__dirname + '/public/uploads/' + folder + '/' + hash + '.1440p.jpg');
 
-      await sharp(shot.path).limitInputPixels(5120 * 2880).resize(3840, 2160, {
-        fit: 'outside'
+      await sharp(shot.path, { limitInputPixels: 5120 * 2880 }).resize(3840, 2160, {
+        fit: 'cover'
       }).jpeg({
         quality: 95
       }).toFile(__dirname + '/public/uploads/' + folder + '/' + hash + '.2160p.jpg');
