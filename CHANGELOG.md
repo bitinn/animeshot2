@@ -1,6 +1,13 @@
 
 # changelog
 
+## v0.12.0
+
+- change: always crop when the screenshot is not 16:9
+- fix: bump many dependencies due to vulnerability reports
+- fix: compatibility with node v12+
+- fix: sharp api changes due to package upgrade
+
 ## v0.11.5
 
 - fix: update `openrecord` version to fix another vulnerability report (`animeshot2` isn't affected as the issue only affects MSSQL).
