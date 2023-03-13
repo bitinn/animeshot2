@@ -53,7 +53,7 @@
     "purest": "^3.1.0",
     "request": "^2.88.2",
     "sharp": "^0.30.7",
-    "sqlite3": "^5.0.0",
+    "sqlite3": "^5.1.5",
     "telegraf": "^3.40.0",
     "validator": "^13.7.0"
   },
